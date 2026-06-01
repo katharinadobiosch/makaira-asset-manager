@@ -126,6 +126,13 @@ export default function Home() {
     await loadAssets()
   }
 
+  function formatDate(value: string) {
+    return new Intl.DateTimeFormat('de-DE', {
+      dateStyle: 'medium',
+      timeStyle: 'short',
+    }).format(new Date(value))
+  }
+
   return (
     <PageWrapper title="Asset Manager">
       <Text>
@@ -227,8 +234,11 @@ export default function Home() {
             )}
           />
 
-          <Column title="Upload" dataIndex="uploadedAt" />
-
+          <Column
+            title="Upload"
+            render={(asset: Asset) => formatDate(asset.uploadedAt)}
+          />
+          
           <Column
             title="Aktion"
             render={(asset: Asset) => (
