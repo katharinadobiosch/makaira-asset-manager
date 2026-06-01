@@ -107,9 +107,7 @@ export default function Home() {
     setEditAlt('')
   }
 
-  async function handleUpdateAsset(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault()
-
+  async function handleUpdateAsset() {
     if (!editingAsset?.metadataKey) return
 
     await fetch('/api/assets', {
@@ -184,7 +182,7 @@ export default function Home() {
               Abbrechen
             </Button>
 
-            <Button type="submit" form="edit-asset-form">
+            <Button type="button" onClick={handleUpdateAsset}>
               Speichern
             </Button>
           </div>
