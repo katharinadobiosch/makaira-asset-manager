@@ -1,0 +1,29 @@
+.thumbnail {
+  border-radius: 8px;
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.uploadForm {
+  display: grid;
+  gap: 16px;
+  margin-top: 24px;
+  margin-bottom: 32px;
+}
+
+.formActions {
+  margin-top: 4px;
+}
+
+.assetTable {
+  margin-top: 24px;
+}
+
+.fileField {
+  display: grid;
+  gap: 6px;
+}

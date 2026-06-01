@@ -1,3 +1,4 @@
+import styles from './index.module.scss'
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
 
@@ -5,11 +6,11 @@ import { withMakaira } from '@/makaira/withMakaira'
 import {
   Button,
   Column,
+  Modal,
   PageWrapper,
   Table,
   Text,
   TextInput,
-  Modal,
 } from '@/components'
 
 type Asset = {
@@ -25,6 +26,7 @@ type Asset = {
 export default function Home() {
   const [assets, setAssets] = useState<Asset[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [isUploading, setIsUploading] = useState(false)
 
   const [title, setTitle] = useState('')
   const [alt, setAlt] = useState('')
@@ -35,7 +37,9 @@ export default function Home() {
   const [editingAsset, setEditingAsset] = useState<Asset | null>(null)
   const [editTitle, setEditTitle] = useState('')
   const [editAlt, setEditAlt] = useState('')
+
   const [assetToDelete, setAssetToDelete] = useState<Asset | null>(null)
+  const [search, setSearch] = useState('')
 
   async function loadAssets() {
     const response = await fetch('/api/assets')
@@ -54,21 +58,27 @@ export default function Home() {
 
     if (!file) return
 
-    const formData = new FormData()
-    formData.append('title', title)
-    formData.append('alt', alt)
-    formData.append('file', file)
+    setIsUploading(true)
 
-    await fetch('/api/upload', {
-      method: 'POST',
-      body: formData,
-    })
+    try {
+      const formData = new FormData()
+      formData.append('title', title)
+      formData.append('alt', alt)
+      formData.append('file', file)
 
-    setTitle('')
-    setAlt('')
-    setFile(null)
+      await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      })
 
-    await loadAssets()
+      setTitle('')
+      setAlt('')
+      setFile(null)
+
+      await loadAssets()
+    } finally {
+      setIsUploading(false)
+    }
   }
 
   async function handleCopyUrl(asset: Asset) {
@@ -133,6 +143,19 @@ export default function Home() {
     }).format(new Date(value))
   }
 
+  const filteredAssets = assets
+    .filter((asset) => {
+      const query = search.toLowerCase()
+
+      return (
+        asset.title.toLowerCase().includes(query) ||
+        asset.alt.toLowerCase().includes(query)
+      )
+    })
+    .sort((a, b) => {
+      return new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime()
+    })
+
   return (
     <PageWrapper title="Asset Manager">
       <Text>
@@ -140,22 +163,24 @@ export default function Home() {
         oder Richtext verwenden.
       </Text>
 
-      <form onSubmit={handleSubmit}>
-        <TextInput
-          name="title"
-          label="Titel"
-          defaultValue={title}
-          onChange={(event) => setTitle(event.target.value)}
-        />
+      <form onSubmit={handleSubmit} className={styles.uploadForm}>
+        <div className={styles.formGrid}>
+          <TextInput
+            name="title"
+            label="Titel"
+            defaultValue={title}
+            onChange={(event) => setTitle(event.target.value)}
+          />
 
-        <TextInput
-          name="alt"
-          label="Alt-Text"
-          defaultValue={alt}
-          onChange={(event) => setAlt(event.target.value)}
-        />
+          <TextInput
+            name="alt"
+            label="Alt-Text"
+            defaultValue={alt}
+            onChange={(event) => setAlt(event.target.value)}
+          />
+        </div>
 
-        <div>
+        <div className={styles.fileField}>
           <label htmlFor="file">Bild</label>
           <input
             id="file"
@@ -168,7 +193,11 @@ export default function Home() {
           />
         </div>
 
-        <Button type="submit">Bild hochladen</Button>
+        <div className={styles.formActions}>
+          <Button type="submit" loading={isUploading}>
+            {isUploading ? 'Bild wird hochgeladen...' : 'Bild hochladen'}
+          </Button>
+        </div>
       </form>
 
       <Modal
@@ -188,7 +217,7 @@ export default function Home() {
           </div>
         }
       >
-        <form id="edit-asset-form" onSubmit={handleUpdateAsset}>
+        <form id="edit-asset-form">
           <TextInput
             name="editTitle"
             label="Titel"
@@ -224,6 +253,7 @@ export default function Home() {
               type="button"
               onClick={async () => {
                 if (!assetToDelete) return
+
                 await handleDeleteAsset(assetToDelete)
                 setAssetToDelete(null)
               }}
@@ -238,73 +268,92 @@ export default function Home() {
 
       {isLoading && <Text>Lade Assets...</Text>}
 
+      {!isLoading && (
+        <TextInput
+          label="Asset suchen"
+          name="search"
+          defaultValue={search}
+          onChange={(event) => setSearch(event.target.value)}
+        />
+      )}
+
       {!isLoading && assets.length === 0 && (
         <Text>Noch keine Assets vorhanden.</Text>
       )}
 
-      {!isLoading && assets.length > 0 && (
-        <Table data={assets}>
-          <Column
-            title="Bild"
-            render={(asset: Asset) => (
-              <Image
-                src={asset.url}
-                alt={asset.alt}
-                width={80}
-                height={80}
-                style={{
-                  objectFit: 'cover',
-                }}
-              />
-            )}
-          />
+      {!isLoading && assets.length > 0 && filteredAssets.length === 0 && (
+        <Text>Keine Assets gefunden.</Text>
+      )}
 
-          <Column title="Titel" dataIndex="title" />
-          <Column title="Alt-Text" dataIndex="alt" />
+      {!isLoading && filteredAssets.length > 0 && (
+        <div className={styles.assetTable}>
+          <Table data={filteredAssets}>
+            <Column
+              title="Bild"
+              render={(asset: Asset) => (
+                <Image
+                  className={styles.thumbnail}
+                  src={asset.url}
+                  alt={asset.alt}
+                  width={120}
+                  height={120}
+                  style={{
+                    objectFit: 'cover',
+                  }}
+                />
+              )}
+            />
 
-          <Column
-            title="URL"
-            render={(asset: Asset) => (
-              <a href={asset.url} target="_blank" rel="noreferrer">
-                öffnen
-              </a>
-            )}
-          />
+            <Column title="Titel" dataIndex="title" />
+            <Column title="Alt-Text" dataIndex="alt" />
 
-          <Column
-            title="Upload"
-            render={(asset: Asset) => formatDate(asset.uploadedAt)}
-          />
+            <Column
+              title="URL"
+              render={(asset: Asset) => (
+                <a href={asset.url} target="_blank" rel="noreferrer">
+                  öffnen
+                </a>
+              )}
+            />
 
-          <Column
-            title="Aktion"
-            render={(asset: Asset) => (
-              <div style={{ display: 'flex', gap: 8 }}>
-                <div style={{ width: 130 }}>
+            <Column
+              title="Upload"
+              render={(asset: Asset) => formatDate(asset.uploadedAt)}
+            />
+
+            <Column
+              title="Aktion"
+              render={(asset: Asset) => (
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <div style={{ width: 130 }}>
+                    <Button
+                      variant="secondary"
+                      onClick={() => handleCopyUrl(asset)}
+                    >
+                      {copiedAssetKey === asset.imageKey
+                        ? 'Kopiert!'
+                        : 'URL kopieren'}
+                    </Button>
+                  </div>
+
                   <Button
                     variant="secondary"
-                    onClick={() => handleCopyUrl(asset)}
+                    onClick={() => startEditing(asset)}
                   >
-                    {copiedAssetKey === asset.imageKey
-                      ? 'Kopiert!'
-                      : 'URL kopieren'}
+                    Bearbeiten
+                  </Button>
+
+                  <Button
+                    variant="secondary"
+                    onClick={() => setAssetToDelete(asset)}
+                  >
+                    Löschen
                   </Button>
                 </div>
-
-                <Button variant="secondary" onClick={() => startEditing(asset)}>
-                  Bearbeiten
-                </Button>
-
-                <Button
-                  variant="secondary"
-                  onClick={() => setAssetToDelete(asset)}
-                >
-                  Löschen
-                </Button>
-              </div>
-            )}
-          />
-        </Table>
+              )}
+            />
+          </Table>
+        </div>
       )}
     </PageWrapper>
   )
