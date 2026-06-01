@@ -9,6 +9,7 @@ import {
   Table,
   Text,
   TextInput,
+  Modal,
 } from '@/components'
 
 type Asset = {
@@ -171,10 +172,24 @@ export default function Home() {
         <Button type="submit">Bild hochladen</Button>
       </form>
 
-      {editingAsset && (
-        <form onSubmit={handleUpdateAsset}>
-          <Text>Asset bearbeiten</Text>
+      <Modal
+        visible={!!editingAsset}
+        onClose={cancelEditing}
+        mask={true}
+        header={<Text>Asset bearbeiten</Text>}
+        footer={
+          <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+            <Button type="button" variant="secondary" onClick={cancelEditing}>
+              Abbrechen
+            </Button>
 
+            <Button type="submit" form="edit-asset-form">
+              Speichern
+            </Button>
+          </div>
+        }
+      >
+        <form id="edit-asset-form" onSubmit={handleUpdateAsset}>
           <TextInput
             name="editTitle"
             label="Titel"
@@ -188,16 +203,8 @@ export default function Home() {
             defaultValue={editAlt}
             onChange={(event) => setEditAlt(event.target.value)}
           />
-
-          <div style={{ display: 'flex', gap: 8 }}>
-            <Button type="submit">Speichern</Button>
-
-            <Button type="button" variant="secondary" onClick={cancelEditing}>
-              Abbrechen
-            </Button>
-          </div>
         </form>
-      )}
+      </Modal>
 
       {isLoading && <Text>Lade Assets...</Text>}
 
@@ -238,7 +245,7 @@ export default function Home() {
             title="Upload"
             render={(asset: Asset) => formatDate(asset.uploadedAt)}
           />
-          
+
           <Column
             title="Aktion"
             render={(asset: Asset) => (
