@@ -1,6 +1,14 @@
 import { useEffect, useState } from 'react'
-
+import Image from 'next/image'
 import { withMakaira } from '@/makaira/withMakaira'
+import {
+  Button,
+  Column,
+  PageWrapper,
+  Table,
+  Text,
+  TextInput,
+} from '@/components'
 
 type Asset = {
   title: string
@@ -17,6 +25,7 @@ export default function Home() {
   const [title, setTitle] = useState('')
   const [alt, setAlt] = useState('')
   const [file, setFile] = useState<File | null>(null)
+  const [copiedAssetKey, setCopiedAssetKey] = useState<string | null>(null)
 
   async function loadAssets() {
     const response = await fetch('/api/assets')
@@ -29,6 +38,30 @@ export default function Home() {
   useEffect(() => {
     loadAssets()
   }, [])
+
+  async function handleCopyUrl(asset: Asset) {
+    await navigator.clipboard.writeText(asset.url)
+
+    setCopiedAssetKey(asset.imageKey)
+
+    setTimeout(() => {
+      setCopiedAssetKey(null)
+    }, 2000)
+  }
+
+  async function handleDeleteAsset(asset: Asset) {
+    await fetch('/api/assets', {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        imageKey: asset.imageKey,
+      }),
+    })
+
+    await loadAssets()
+  }
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -53,83 +86,95 @@ export default function Home() {
   }
 
   return (
-    <main>
-      <h1>Asset Manager</h1>
-
-      <p>
+    <PageWrapper title="Asset Manager">
+      <Text>
         Bilder für den Bettwaren-Shop hochladen, verwalten und als URL für HTML
         oder Richtext verwenden.
-      </p>
-
+      </Text>
       <form onSubmit={handleSubmit}>
         <div>
           <label htmlFor="title">Titel</label>
-          <input
-            id="title"
-            value={title}
+          <TextInput
+            name="title"
+            label="Titel"
+            defaultValue={title}
             onChange={(event) => setTitle(event.target.value)}
-            required
           />
         </div>
 
         <div>
           <label htmlFor="alt">Alt-Text</label>
-          <input
-            id="alt"
-            value={alt}
+          <TextInput
+            name="alt"
+            label="Alt-Text"
+            defaultValue={alt}
             onChange={(event) => setAlt(event.target.value)}
-            required
           />
         </div>
 
-        <div>
-          <label htmlFor="file">Bild</label>
-          <input
-            id="file"
-            type="file"
-            accept="image/*"
-            onChange={(event) => {
-              setFile(event.target.files?.[0] ?? null)
-            }}
-            required
-          />
-        </div>
-
-        <button type="submit">Bild hochladen</button>
+        <Button type="submit">Bild hochladen</Button>
       </form>
-
-      {isLoading && <p>Lade Assets...</p>}
-
-      {!isLoading && assets.length === 0 && <p>Noch keine Assets vorhanden.</p>}
-
-      {!isLoading && assets.length > 0 && (
-        <table>
-          <thead>
-            <tr>
-              <th>Titel</th>
-              <th>Alt-Text</th>
-              <th>URL</th>
-              <th>Upload</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {assets.map((asset) => (
-              <tr key={asset.imageKey}>
-                <td>{asset.title}</td>
-                <td>{asset.alt}</td>
-                <td>
-                  <a href={asset.url} target="_blank" rel="noreferrer">
-                    öffnen
-                  </a>
-                </td>
-                <td>{asset.uploadedAt}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      {isLoading && <Text>Lade Assets...</Text>}
+      {!isLoading && assets.length === 0 && (
+        <Text>Noch keine Assets vorhanden.</Text>
       )}
-    </main>
+      {!isLoading && assets.length > 0 && (
+        <Table data={assets}>
+          <Column
+            title="Bild"
+            render={(asset: Asset) => (
+              <Image
+                src={asset.url}
+                alt={asset.alt}
+                width={80}
+                height={80}
+                style={{
+                  objectFit: 'cover',
+                }}
+              />
+            )}
+          />
+          <Column title="Titel" dataIndex="title" />
+          <Column title="Alt-Text" dataIndex="alt" />
+
+          <Column
+            title="URL"
+            render={(asset: Asset) => (
+              <a href={asset.url} target="_blank" rel="noreferrer">
+                öffnen
+              </a>
+            )}
+          />
+
+          <Column title="Upload" dataIndex="uploadedAt" />
+
+          <Column
+            title="Aktion"
+            render={(asset: Asset) => (
+              <div style={{ display: 'flex', gap: 8 }}>
+                <div style={{ width: 130 }}>
+                  <Button
+                    variant="secondary"
+                    onClick={() => handleCopyUrl(asset)}
+                  >
+                    {copiedAssetKey === asset.imageKey
+                      ? 'Kopiert!'
+                      : 'URL kopieren'}
+                  </Button>
+                </div>
+
+                <Button
+                  variant="secondary"
+                  onClick={() => handleDeleteAsset(asset)}
+                >
+                  Löschen
+                </Button>
+              </div>
+            )}
+          />
+        </Table>
+      )}
+    </PageWrapper>
   )
 }
 
