@@ -1,27 +1,15 @@
-import styles from './index.module.scss'
 import { useEffect, useState } from 'react'
-import Image from 'next/image'
-
 import { withMakaira } from '@/makaira/withMakaira'
-import {
-  Button,
-  Column,
-  Modal,
-  PageWrapper,
-  Table,
-  Text,
-  TextInput,
-} from '@/components'
+import { PageWrapper, Text } from '@/components'
 
-type Asset = {
-  title: string
-  alt: string
-  imageKey: string
-  metadataKey?: string
-  url: string
-  uploadedAt: string
-  updatedAt?: string
-}
+import {
+  Asset,
+  AssetSearch,
+  AssetTable,
+  AssetUploadForm,
+  DeleteAssetModal,
+  EditAssetModal,
+} from '@/components/AssetManager'
 
 export default function Home() {
   const [assets, setAssets] = useState<Asset[]>([])
@@ -163,119 +151,40 @@ export default function Home() {
         oder Richtext verwenden.
       </Text>
 
-      <form onSubmit={handleSubmit} className={styles.uploadForm}>
-        <div className={styles.formGrid}>
-          <TextInput
-            name="title"
-            label="Titel"
-            defaultValue={title}
-            onChange={(event) => setTitle(event.target.value)}
-          />
+      <AssetUploadForm
+        title={title}
+        alt={alt}
+        isUploading={isUploading}
+        onTitleChange={setTitle}
+        onAltChange={setAlt}
+        onFileChange={setFile}
+        onSubmit={handleSubmit}
+      />
 
-          <TextInput
-            name="alt"
-            label="Alt-Text"
-            defaultValue={alt}
-            onChange={(event) => setAlt(event.target.value)}
-          />
-        </div>
+      <EditAssetModal
+        asset={editingAsset}
+        title={editTitle}
+        alt={editAlt}
+        onTitleChange={setEditTitle}
+        onAltChange={setEditAlt}
+        onCancel={cancelEditing}
+        onSave={handleUpdateAsset}
+      />
 
-        <div className={styles.fileField}>
-          <label htmlFor="file">Bild</label>
-          <input
-            id="file"
-            name="file"
-            type="file"
-            accept="image/*"
-            onChange={(event) => {
-              setFile(event.target.files?.[0] ?? null)
-            }}
-          />
-        </div>
+      <DeleteAssetModal
+        asset={assetToDelete}
+        onCancel={() => setAssetToDelete(null)}
+        onConfirm={async () => {
+          if (!assetToDelete) return
 
-        <div className={styles.formActions}>
-          <Button type="submit" loading={isUploading}>
-            {isUploading ? 'Bild wird hochgeladen...' : 'Bild hochladen'}
-          </Button>
-        </div>
-      </form>
-
-      <Modal
-        visible={!!editingAsset}
-        onClose={cancelEditing}
-        mask={true}
-        header={<Text>Asset bearbeiten</Text>}
-        footer={
-          <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
-            <Button type="button" variant="secondary" onClick={cancelEditing}>
-              Abbrechen
-            </Button>
-
-            <Button type="button" onClick={handleUpdateAsset}>
-              Speichern
-            </Button>
-          </div>
-        }
-      >
-        <form id="edit-asset-form">
-          <TextInput
-            name="editTitle"
-            label="Titel"
-            defaultValue={editTitle}
-            onChange={(event) => setEditTitle(event.target.value)}
-          />
-
-          <TextInput
-            name="editAlt"
-            label="Alt-Text"
-            defaultValue={editAlt}
-            onChange={(event) => setEditAlt(event.target.value)}
-          />
-        </form>
-      </Modal>
-
-      <Modal
-        visible={!!assetToDelete}
-        onClose={() => setAssetToDelete(null)}
-        mask={true}
-        header={<Text>Asset löschen</Text>}
-        footer={
-          <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
-            <Button
-              type="button"
-              variant="secondary"
-              onClick={() => setAssetToDelete(null)}
-            >
-              Abbrechen
-            </Button>
-
-            <Button
-              type="button"
-              onClick={async () => {
-                if (!assetToDelete) return
-
-                await handleDeleteAsset(assetToDelete)
-                setAssetToDelete(null)
-              }}
-            >
-              Löschen
-            </Button>
-          </div>
-        }
-      >
-        <Text>Möchtest du dieses Asset wirklich löschen?</Text>
-      </Modal>
+          await handleDeleteAsset(assetToDelete)
+          setAssetToDelete(null)
+        }}
+      />
 
       {isLoading && <Text>Lade Assets...</Text>}
 
-      {!isLoading && (
-        <TextInput
-          label="Asset suchen"
-          name="search"
-          defaultValue={search}
-          onChange={(event) => setSearch(event.target.value)}
-        />
-      )}
+      {!isLoading && <AssetSearch search={search} onSearchChange={setSearch} />}
 
       {!isLoading && assets.length === 0 && (
         <Text>Noch keine Assets vorhanden.</Text>
@@ -286,74 +195,14 @@ export default function Home() {
       )}
 
       {!isLoading && filteredAssets.length > 0 && (
-        <div className={styles.assetTable}>
-          <Table data={filteredAssets}>
-            <Column
-              title="Bild"
-              render={(asset: Asset) => (
-                <Image
-                  className={styles.thumbnail}
-                  src={asset.url}
-                  alt={asset.alt}
-                  width={120}
-                  height={120}
-                  style={{
-                    objectFit: 'cover',
-                  }}
-                />
-              )}
-            />
-
-            <Column title="Titel" dataIndex="title" />
-            <Column title="Alt-Text" dataIndex="alt" />
-
-            <Column
-              title="URL"
-              render={(asset: Asset) => (
-                <a href={asset.url} target="_blank" rel="noreferrer">
-                  öffnen
-                </a>
-              )}
-            />
-
-            <Column
-              title="Upload"
-              render={(asset: Asset) => formatDate(asset.uploadedAt)}
-            />
-
-            <Column
-              title="Aktion"
-              render={(asset: Asset) => (
-                <div style={{ display: 'flex', gap: 8 }}>
-                  <div style={{ width: 130 }}>
-                    <Button
-                      variant="secondary"
-                      onClick={() => handleCopyUrl(asset)}
-                    >
-                      {copiedAssetKey === asset.imageKey
-                        ? 'Kopiert!'
-                        : 'URL kopieren'}
-                    </Button>
-                  </div>
-
-                  <Button
-                    variant="secondary"
-                    onClick={() => startEditing(asset)}
-                  >
-                    Bearbeiten
-                  </Button>
-
-                  <Button
-                    variant="secondary"
-                    onClick={() => setAssetToDelete(asset)}
-                  >
-                    Löschen
-                  </Button>
-                </div>
-              )}
-            />
-          </Table>
-        </div>
+        <AssetTable
+          assets={filteredAssets}
+          copiedAssetKey={copiedAssetKey}
+          onCopyUrl={handleCopyUrl}
+          onEdit={startEditing}
+          onDelete={setAssetToDelete}
+          formatDate={formatDate}
+        />
       )}
     </PageWrapper>
   )
