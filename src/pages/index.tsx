@@ -14,18 +14,43 @@ type Asset = {
 export default function Home() {
   const [assets, setAssets] = useState<Asset[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [title, setTitle] = useState('')
+  const [alt, setAlt] = useState('')
+  const [file, setFile] = useState<File | null>(null)
+
+  async function loadAssets() {
+    const response = await fetch('/api/assets')
+    const data = await response.json()
+
+    setAssets(data.assets)
+    setIsLoading(false)
+  }
 
   useEffect(() => {
-    async function loadAssets() {
-      const response = await fetch('/api/assets')
-      const data = await response.json()
-
-      setAssets(data.assets)
-      setIsLoading(false)
-    }
-
     loadAssets()
   }, [])
+
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+
+    if (!file) return
+
+    const formData = new FormData()
+    formData.append('title', title)
+    formData.append('alt', alt)
+    formData.append('file', file)
+
+    await fetch('/api/upload', {
+      method: 'POST',
+      body: formData,
+    })
+
+    setTitle('')
+    setAlt('')
+    setFile(null)
+
+    await loadAssets()
+  }
 
   return (
     <main>
@@ -35,6 +60,43 @@ export default function Home() {
         Bilder für den Bettwaren-Shop hochladen, verwalten und als URL für HTML
         oder Richtext verwenden.
       </p>
+
+      <form onSubmit={handleSubmit}>
+        <div>
+          <label htmlFor="title">Titel</label>
+          <input
+            id="title"
+            value={title}
+            onChange={(event) => setTitle(event.target.value)}
+            required
+          />
+        </div>
+
+        <div>
+          <label htmlFor="alt">Alt-Text</label>
+          <input
+            id="alt"
+            value={alt}
+            onChange={(event) => setAlt(event.target.value)}
+            required
+          />
+        </div>
+
+        <div>
+          <label htmlFor="file">Bild</label>
+          <input
+            id="file"
+            type="file"
+            accept="image/*"
+            onChange={(event) => {
+              setFile(event.target.files?.[0] ?? null)
+            }}
+            required
+          />
+        </div>
+
+        <button type="submit">Bild hochladen</button>
+      </form>
 
       {isLoading && <p>Lade Assets...</p>}
 
