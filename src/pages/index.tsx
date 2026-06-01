@@ -35,6 +35,7 @@ export default function Home() {
   const [editingAsset, setEditingAsset] = useState<Asset | null>(null)
   const [editTitle, setEditTitle] = useState('')
   const [editAlt, setEditAlt] = useState('')
+  const [assetToDelete, setAssetToDelete] = useState<Asset | null>(null)
 
   async function loadAssets() {
     const response = await fetch('/api/assets')
@@ -206,6 +207,37 @@ export default function Home() {
         </form>
       </Modal>
 
+      <Modal
+        visible={!!assetToDelete}
+        onClose={() => setAssetToDelete(null)}
+        mask={true}
+        header={<Text>Asset löschen</Text>}
+        footer={
+          <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => setAssetToDelete(null)}
+            >
+              Abbrechen
+            </Button>
+
+            <Button
+              type="button"
+              onClick={async () => {
+                if (!assetToDelete) return
+                await handleDeleteAsset(assetToDelete)
+                setAssetToDelete(null)
+              }}
+            >
+              Löschen
+            </Button>
+          </div>
+        }
+      >
+        <Text>Möchtest du dieses Asset wirklich löschen?</Text>
+      </Modal>
+
       {isLoading && <Text>Lade Assets...</Text>}
 
       {!isLoading && assets.length === 0 && (
@@ -267,7 +299,7 @@ export default function Home() {
 
                 <Button
                   variant="secondary"
-                  onClick={() => handleDeleteAsset(asset)}
+                  onClick={() => setAssetToDelete(asset)}
                 >
                   Löschen
                 </Button>
