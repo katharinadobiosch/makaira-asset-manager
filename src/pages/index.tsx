@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
+
 import { withMakaira } from '@/makaira/withMakaira'
 import {
   Button,
@@ -14,6 +15,7 @@ type Asset = {
   title: string
   alt: string
   imageKey: string
+  metadataKey?: string
   url: string
   uploadedAt: string
   updatedAt?: string
@@ -22,10 +24,16 @@ type Asset = {
 export default function Home() {
   const [assets, setAssets] = useState<Asset[]>([])
   const [isLoading, setIsLoading] = useState(true)
+
   const [title, setTitle] = useState('')
   const [alt, setAlt] = useState('')
   const [file, setFile] = useState<File | null>(null)
+
   const [copiedAssetKey, setCopiedAssetKey] = useState<string | null>(null)
+
+  const [editingAsset, setEditingAsset] = useState<Asset | null>(null)
+  const [editTitle, setEditTitle] = useState('')
+  const [editAlt, setEditAlt] = useState('')
 
   async function loadAssets() {
     const response = await fetch('/api/assets')
@@ -38,6 +46,28 @@ export default function Home() {
   useEffect(() => {
     loadAssets()
   }, [])
+
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+
+    if (!file) return
+
+    const formData = new FormData()
+    formData.append('title', title)
+    formData.append('alt', alt)
+    formData.append('file', file)
+
+    await fetch('/api/upload', {
+      method: 'POST',
+      body: formData,
+    })
+
+    setTitle('')
+    setAlt('')
+    setFile(null)
+
+    await loadAssets()
+  }
 
   async function handleCopyUrl(asset: Asset) {
     await navigator.clipboard.writeText(asset.url)
@@ -63,25 +93,36 @@ export default function Home() {
     await loadAssets()
   }
 
-  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  function startEditing(asset: Asset) {
+    setEditingAsset(asset)
+    setEditTitle(asset.title)
+    setEditAlt(asset.alt)
+  }
+
+  function cancelEditing() {
+    setEditingAsset(null)
+    setEditTitle('')
+    setEditAlt('')
+  }
+
+  async function handleUpdateAsset(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
 
-    if (!file) return
+    if (!editingAsset?.metadataKey) return
 
-    const formData = new FormData()
-    formData.append('title', title)
-    formData.append('alt', alt)
-    formData.append('file', file)
-
-    await fetch('/api/upload', {
-      method: 'POST',
-      body: formData,
+    await fetch('/api/assets', {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        metadataKey: editingAsset.metadataKey,
+        title: editTitle,
+        alt: editAlt,
+      }),
     })
 
-    setTitle('')
-    setAlt('')
-    setFile(null)
-
+    cancelEditing()
     await loadAssets()
   }
 
@@ -91,33 +132,72 @@ export default function Home() {
         Bilder für den Bettwaren-Shop hochladen, verwalten und als URL für HTML
         oder Richtext verwenden.
       </Text>
+
       <form onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="title">Titel</label>
-          <TextInput
-            name="title"
-            label="Titel"
-            defaultValue={title}
-            onChange={(event) => setTitle(event.target.value)}
-          />
-        </div>
+        <TextInput
+          name="title"
+          label="Titel"
+          defaultValue={title}
+          onChange={(event) => setTitle(event.target.value)}
+        />
+
+        <TextInput
+          name="alt"
+          label="Alt-Text"
+          defaultValue={alt}
+          onChange={(event) => setAlt(event.target.value)}
+        />
 
         <div>
-          <label htmlFor="alt">Alt-Text</label>
-          <TextInput
-            name="alt"
-            label="Alt-Text"
-            defaultValue={alt}
-            onChange={(event) => setAlt(event.target.value)}
+          <label htmlFor="file">Bild</label>
+          <input
+            id="file"
+            name="file"
+            type="file"
+            accept="image/*"
+            onChange={(event) => {
+              setFile(event.target.files?.[0] ?? null)
+            }}
           />
         </div>
 
         <Button type="submit">Bild hochladen</Button>
       </form>
+
+      {editingAsset && (
+        <form onSubmit={handleUpdateAsset}>
+          <Text>Asset bearbeiten</Text>
+
+          <TextInput
+            name="editTitle"
+            label="Titel"
+            defaultValue={editTitle}
+            onChange={(event) => setEditTitle(event.target.value)}
+          />
+
+          <TextInput
+            name="editAlt"
+            label="Alt-Text"
+            defaultValue={editAlt}
+            onChange={(event) => setEditAlt(event.target.value)}
+          />
+
+          <div style={{ display: 'flex', gap: 8 }}>
+            <Button type="submit">Speichern</Button>
+
+            <Button type="button" variant="secondary" onClick={cancelEditing}>
+              Abbrechen
+            </Button>
+          </div>
+        </form>
+      )}
+
       {isLoading && <Text>Lade Assets...</Text>}
+
       {!isLoading && assets.length === 0 && (
         <Text>Noch keine Assets vorhanden.</Text>
       )}
+
       {!isLoading && assets.length > 0 && (
         <Table data={assets}>
           <Column
@@ -134,6 +214,7 @@ export default function Home() {
               />
             )}
           />
+
           <Column title="Titel" dataIndex="title" />
           <Column title="Alt-Text" dataIndex="alt" />
 
@@ -162,6 +243,10 @@ export default function Home() {
                       : 'URL kopieren'}
                   </Button>
                 </div>
+
+                <Button variant="secondary" onClick={() => startEditing(asset)}>
+                  Bearbeiten
+                </Button>
 
                 <Button
                   variant="secondary"

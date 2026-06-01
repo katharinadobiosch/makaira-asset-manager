@@ -55,15 +55,16 @@ export default async function handler(
     contentType: file.mimetype ?? 'application/octet-stream',
   })
 
+  const metadataKey = imageKey.replace(/\.[^.]+$/, '.json')
+
   const metadata = {
     title,
     alt,
     imageKey,
+    metadataKey,
     url: imageUpload.url,
     uploadedAt: new Date().toISOString(),
   }
-
-  const metadataKey = imageKey.replace(/\.[^.]+$/, '.json')
 
   await uploadAsset({
     key: metadataKey,
