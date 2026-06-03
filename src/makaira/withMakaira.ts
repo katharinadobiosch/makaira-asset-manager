@@ -50,7 +50,7 @@ export function withMakaira<T>(
       }
     } else {
       console.error(
-        '[Asset Manager]: Missing MAKAIRA_APP_SECRET / MAKAIRA_APP_SLUG environment variables'
+        '[Asset Manager]: Missing Makaira single-tenant env variables (MAKAIRA_APP_SECRET + MAKAIRA_APP_SLUG, or MAKAIRA_APP_SECRET_CONTENT_WIDGET + MAKAIRA_APP_SLUG_CONTENT_WIDGET, or MAKAIRA_APP_SECRET_CONTENT_MODAL + MAKAIRA_APP_SLUG_CONTENT_MODAL)'
       )
 
       return {
