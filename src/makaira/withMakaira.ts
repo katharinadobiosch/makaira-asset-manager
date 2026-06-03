@@ -1,20 +1,18 @@
 import { GetServerSidePropsContext, GetServerSidePropsResult } from 'next'
 
-import { APP_TYPE, MakairaAuthData } from '@/types/App'
+import { MakairaAuthData } from '@/types/App'
 import { getSingleVendorAuth } from '@/utils/getSingleVendorAuth'
-import { requestWithMakaira } from '@/utils/request'
 
 type IncomingPageServerSideProp<P> = (
   ctx: GetServerSidePropsContext
 ) => Promise<GetServerSidePropsResult<P>>
 
-
 /**
- * Using for APP with install in single Makaira's instance and 
+ * Using for APP with install in single Makaira's instance and
  * provided SECRET, SLUG via Environment instead of store in db
- * 
- * @param incomingGSSP 
- * @returns 
+ *
+ * @param incomingGSSP
+ * @returns
  */
 export function withMakaira<T>(
   incomingGSSP?: IncomingPageServerSideProp<T> | null
@@ -23,43 +21,44 @@ export function withMakaira<T>(
     ctx: GetServerSidePropsContext
   ): Promise<GetServerSidePropsResult<T & MakairaAuthData>> => {
     const url = new URL(ctx.req.url ?? '', `https://${ctx.req.headers.host}`)
-    let secretProps = null;
+    let secretProps = null
 
     if (
       process.env.MAKAIRA_APP_SECRET_CONTENT_WIDGET ||
       process.env.MAKAIRA_APP_SECRET_CONTENT_MODAL ||
       process.env.MAKAIRA_APP_SECRET
     ) {
-      console.debug("[Example-App]: Process app auth with single vendor from ENV")
+      console.debug(
+        '[Example-App]: Process app auth with single vendor from ENV'
+      )
 
       const appType = ctx.query.appType as string
 
       secretProps = getSingleVendorAuth(url.pathname, {
         ...ctx.query,
-        appType
+        appType,
       })
 
       if (!secretProps) {
         return {
           redirect: {
             permanent: false,
-            destination: "/bad-auth",
+            destination: '/bad-auth',
           },
-          props:{} as any,
-        }; 
+          props: {} as any,
+        }
       }
     } else {
-      try {
-        secretProps = await requestWithMakaira('/api/auth', ctx.query)
-        console.debug("[Example-App]: Process app auth with multi vendors from server", secretProps)
-      } catch (error) {
-        return {
-          redirect: {
-            permanent: false,
-            destination: "/bad-auth",
-          },
-          props:{} as any,
-        }; 
+      console.error(
+        '[Asset Manager]: Missing MAKAIRA_APP_SECRET / MAKAIRA_APP_SLUG environment variables'
+      )
+
+      return {
+        redirect: {
+          permanent: false,
+          destination: '/bad-auth',
+        },
+        props: {} as any,
       }
     }
 
