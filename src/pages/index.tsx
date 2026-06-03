@@ -37,6 +37,9 @@ export default function Home() {
     setSearch,
     handleSubmit,
     formatDate,
+    errorMessage,
+    file,
+    uploadFormKey,
   } = useAssets()
 
   return (
@@ -47,6 +50,7 @@ export default function Home() {
       </Text>
 
       <AssetUploadForm
+        key={uploadFormKey}
         title={title}
         alt={alt}
         isUploading={isUploading}
@@ -54,6 +58,8 @@ export default function Home() {
         onAltChange={setAlt}
         onFileChange={setFile}
         onSubmit={handleSubmit}
+        isSubmitDisabled={!title || !alt || !file || isUploading}
+        errorMessage={errorMessage ?? undefined}
       />
 
       <EditAssetModal

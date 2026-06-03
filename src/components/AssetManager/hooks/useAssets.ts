@@ -1,5 +1,11 @@
 import { useEffect, useState } from 'react'
 import { Asset } from '../types'
+import {
+  fetchAssets,
+  uploadAsset,
+  updateAsset,
+  deleteAsset,
+} from '../services/assetService'
 
 export function useAssets() {
   const [assets, setAssets] = useState<Asset[]>([])
@@ -19,11 +25,14 @@ export function useAssets() {
   const [assetToDelete, setAssetToDelete] = useState<Asset | null>(null)
   const [search, setSearch] = useState('')
 
-  async function loadAssets() {
-    const response = await fetch('/api/assets')
-    const data = await response.json()
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
-    setAssets(data.assets)
+  const [uploadFormKey, setUploadFormKey] = useState(0)
+
+  async function loadAssets() {
+    const assets = await fetchAssets()
+
+    setAssets(assets)
     setIsLoading(false)
   }
 
@@ -34,26 +43,25 @@ export function useAssets() {
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
 
-    if (!file) return
+    if (!title || !alt || !file) {
+      setErrorMessage('Bitte Titel, Alt-Text und Bild ausfüllen.')
+      return
+    }
 
     setIsUploading(true)
+    setErrorMessage(null)
 
     try {
-      const formData = new FormData()
-      formData.append('title', title)
-      formData.append('alt', alt)
-      formData.append('file', file)
-
-      await fetch('/api/upload', {
-        method: 'POST',
-        body: formData,
-      })
+      await uploadAsset(title, alt, file)
 
       setTitle('')
       setAlt('')
       setFile(null)
+      setUploadFormKey((currentKey) => currentKey + 1)
 
       await loadAssets()
+    } catch {
+      setErrorMessage('Bild konnte nicht hochgeladen werden.')
     } finally {
       setIsUploading(false)
     }
@@ -70,17 +78,14 @@ export function useAssets() {
   }
 
   async function handleDeleteAsset(asset: Asset) {
-    await fetch('/api/assets', {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        imageKey: asset.imageKey,
-      }),
-    })
+    setErrorMessage(null)
 
-    await loadAssets()
+    try {
+      await deleteAsset(asset.imageKey)
+      await loadAssets()
+    } catch {
+      setErrorMessage('Asset konnte nicht gelöscht werden.')
+    }
   }
 
   function startEditing(asset: Asset) {
@@ -98,20 +103,16 @@ export function useAssets() {
   async function handleUpdateAsset() {
     if (!editingAsset?.metadataKey) return
 
-    await fetch('/api/assets', {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        metadataKey: editingAsset.metadataKey,
-        title: editTitle,
-        alt: editAlt,
-      }),
-    })
+    setErrorMessage(null)
 
-    cancelEditing()
-    await loadAssets()
+    try {
+      await updateAsset(editingAsset.metadataKey, editTitle, editAlt)
+
+      cancelEditing()
+      await loadAssets()
+    } catch {
+      setErrorMessage('Asset konnte nicht gespeichert werden.')
+    }
   }
 
   function formatDate(value: string) {
@@ -142,6 +143,7 @@ export function useAssets() {
 
     title,
     alt,
+    file,
     setTitle,
     setAlt,
     setFile,
@@ -167,5 +169,10 @@ export function useAssets() {
 
     handleSubmit,
     formatDate,
+
+    errorMessage,
+    setErrorMessage,
+
+    uploadFormKey,
   }
 }
