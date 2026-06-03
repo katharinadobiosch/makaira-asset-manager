@@ -34,10 +34,14 @@ export function withMakaira<T>(
 
       const appType = ctx.query.appType as string
 
-      secretProps = getSingleVendorAuth(url.pathname, {
-        ...ctx.query,
-        appType,
-      })
+      try {
+        secretProps = getSingleVendorAuth(url.pathname, {
+          ...ctx.query,
+          appType,
+        })
+      } catch {
+        secretProps = null
+      }
 
       if (!secretProps) {
         return {
