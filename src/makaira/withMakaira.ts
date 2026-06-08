@@ -29,7 +29,7 @@ export function withMakaira<T>(
       process.env.MAKAIRA_APP_SECRET
     ) {
       console.debug(
-        '[Example-App]: Process app auth with single vendor from ENV'
+        '[Asset Manager]: Process app auth with single vendor from ENV'
       )
 
       const appType = ctx.query.appType as string
