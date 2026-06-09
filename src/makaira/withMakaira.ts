@@ -41,7 +41,7 @@ export function withMakaira<T>(
         })
       } catch (error) {
         console.error(
-          '[Asset Manager]: Failed to process Makaira single-vendor auth. Missing or invalid env variables.',
+          '[Asset Manager]: Failed to process Makaira single-vendor auth from environment variables',
           error
         )
       }
