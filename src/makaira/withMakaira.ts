@@ -39,8 +39,11 @@ export function withMakaira<T>(
           ...ctx.query,
           appType,
         })
-      } catch {
-        secretProps = null
+      } catch (error) {
+        console.error(
+          '[Asset Manager]: Failed to process Makaira single-vendor auth. Missing or invalid env variables.',
+          error
+        )
       }
 
       if (!secretProps) {
