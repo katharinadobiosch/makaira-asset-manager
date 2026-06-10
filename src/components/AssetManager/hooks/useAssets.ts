@@ -26,6 +26,7 @@ export function useAssets() {
 
   const [assetToDelete, setAssetToDelete] = useState<Asset | null>(null)
   const [search, setSearch] = useState('')
+  const [selectedFolder, setSelectedFolder] = useState('')
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
@@ -82,6 +83,14 @@ export function useAssets() {
       setErrorMessage('Bild konnte nicht hochgeladen werden.')
     } finally {
       setIsUploading(false)
+    }
+  }
+
+  function handleFolderChange(value: string) {
+    setFolder(value)
+
+    if (errorMessage) {
+      setErrorMessage(null)
     }
   }
 
@@ -142,6 +151,13 @@ export function useAssets() {
 
   const filteredAssets = assets
     .filter((asset) => {
+      if (!selectedFolder) {
+        return true
+      }
+
+      return asset.folder === selectedFolder
+    })
+    .filter((asset) => {
       const query = search.toLowerCase()
 
       return (
@@ -153,14 +169,6 @@ export function useAssets() {
     .sort((a, b) => {
       return new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime()
     })
-
-  function handleFolderChange(value: string) {
-    setFolder(value)
-
-    if (errorMessage) {
-      setErrorMessage(null)
-    }
-  }
 
   return {
     assets,
@@ -198,6 +206,8 @@ export function useAssets() {
 
     search,
     setSearch,
+    selectedFolder,
+    setSelectedFolder,
 
     handleSubmit,
     formatDate,

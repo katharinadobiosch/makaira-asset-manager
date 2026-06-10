@@ -7,6 +7,7 @@ import {
   DeleteAssetModal,
   EditAssetModal,
   useAssets,
+  AssetFolderFilter,
 } from '@/components/AssetManager'
 
 export default function Home() {
@@ -44,6 +45,8 @@ export default function Home() {
     setFolder,
     existingFolders,
     handleFolderChange,
+    selectedFolder,
+    setSelectedFolder,
   } = useAssets()
 
   return (
@@ -91,6 +94,12 @@ export default function Home() {
       />
 
       {isLoading && <Text>Lade Assets...</Text>}
+
+      <AssetFolderFilter
+        folders={existingFolders}
+        selectedFolder={selectedFolder}
+        onFolderChange={setSelectedFolder}
+      />
 
       {!isLoading && <AssetSearch search={search} onSearchChange={setSearch} />}
 
