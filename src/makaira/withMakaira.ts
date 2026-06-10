@@ -8,8 +8,8 @@ type IncomingPageServerSideProp<P> = (
 ) => Promise<GetServerSidePropsResult<P>>
 
 /**
- * Handles Makaira app authentication for a single instance using
- * SECRET and SLUG environment variables instead of database-stored credentials.
+ * Handles Makaira authentication for a single installed app instance.
+ * Uses SECRET and SLUG environment variables instead of database-stored credentials.
  *
  * @param incomingGSSP
  * @returns
