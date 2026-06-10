@@ -40,6 +40,10 @@ export default function Home() {
     errorMessage,
     file,
     uploadFormKey,
+    folder,
+    setFolder,
+    existingFolders,
+    handleFolderChange,
   } = useAssets()
 
   return (
@@ -60,6 +64,9 @@ export default function Home() {
         onSubmit={handleSubmit}
         isSubmitDisabled={!title || !alt || !file || isUploading}
         errorMessage={errorMessage ?? undefined}
+        folder={folder}
+        existingFolders={existingFolders}
+        onFolderChange={handleFolderChange}
       />
 
       <EditAssetModal

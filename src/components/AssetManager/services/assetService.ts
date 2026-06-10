@@ -1,3 +1,4 @@
+// src/components/AssetManager/services/assetService.ts
 import { Asset } from '../types'
 
 export async function fetchAssets() {
@@ -12,11 +13,12 @@ export async function fetchAssets() {
   return data.assets as Asset[]
 }
 
-export async function uploadAsset(title: string, alt: string, file: File) {
+export async function uploadAsset(title: string, alt: string, folder: string, file: File) {
   const formData = new FormData()
 
   formData.append('title', title)
   formData.append('alt', alt)
+  formData.append('folder', folder)
   formData.append('file', file)
 
   const response = await fetch('/api/upload', {
@@ -27,6 +29,7 @@ export async function uploadAsset(title: string, alt: string, file: File) {
   if (!response.ok) {
     throw new Error('Upload failed')
   }
+  
 }
 
 export async function updateAsset(

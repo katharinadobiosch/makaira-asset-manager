@@ -12,7 +12,7 @@
   display: grid;
   gap: 16px;
   margin-top: 24px;
-  margin-bottom: 32px;
+  margin-bottom: 16px;
 }
 
 .formActions {
@@ -26,4 +26,17 @@
 .fileField {
   display: grid;
   gap: 6px;
+}
+
+.folderHint {
+  margin-top: 8px;
+  font-size: 14px;
+}
+
+.formError {
+  margin: 0px 0 16px 0;
+  padding: 12px 16px;
+  border: 1px solid #b00020;
+  border-radius: 8px;
+  background: #fff5f5;
 }

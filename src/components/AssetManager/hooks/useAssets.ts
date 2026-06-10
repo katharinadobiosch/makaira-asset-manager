@@ -6,6 +6,7 @@ import {
   updateAsset,
   deleteAsset,
 } from '../services/assetService'
+import { validateFolderName } from '../utils/folderValidation'
 
 export function useAssets() {
   const [assets, setAssets] = useState<Asset[]>([])
@@ -14,6 +15,7 @@ export function useAssets() {
 
   const [title, setTitle] = useState('')
   const [alt, setAlt] = useState('')
+  const [folder, setFolder] = useState('')
   const [file, setFile] = useState<File | null>(null)
 
   const [copiedAssetKey, setCopiedAssetKey] = useState<string | null>(null)
@@ -36,6 +38,14 @@ export function useAssets() {
     setIsLoading(false)
   }
 
+  const existingFolders = Array.from(
+    new Set(
+      assets
+        .map((asset) => asset.folder)
+        .filter((folder): folder is string => Boolean(folder))
+    )
+  ).sort((a, b) => a.localeCompare(b))
+
   useEffect(() => {
     loadAssets()
   }, [])
@@ -43,8 +53,15 @@ export function useAssets() {
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
 
-    if (!title || !alt || !file) {
-      setErrorMessage('Bitte Titel, Alt-Text und Bild ausfüllen.')
+    if (!title || !alt || !file || !folder) {
+      setErrorMessage('Bitte Titel, Alt-Text, Bild und Ordner ausfüllen.')
+      return
+    }
+
+    const folderValidationError = validateFolderName(folder)
+
+    if (folderValidationError) {
+      setErrorMessage(folderValidationError)
       return
     }
 
@@ -52,11 +69,12 @@ export function useAssets() {
     setErrorMessage(null)
 
     try {
-      await uploadAsset(title, alt, file)
+      await uploadAsset(title, alt, folder, file)
 
       setTitle('')
       setAlt('')
       setFile(null)
+      setFolder('')
       setUploadFormKey((currentKey) => currentKey + 1)
 
       await loadAssets()
@@ -128,25 +146,38 @@ export function useAssets() {
 
       return (
         asset.title.toLowerCase().includes(query) ||
-        asset.alt.toLowerCase().includes(query)
+        asset.alt.toLowerCase().includes(query) ||
+        asset.folder?.toLowerCase().includes(query)
       )
     })
     .sort((a, b) => {
       return new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime()
     })
 
+  function handleFolderChange(value: string) {
+    setFolder(value)
+
+    if (errorMessage) {
+      setErrorMessage(null)
+    }
+  }
+
   return {
     assets,
     filteredAssets,
+    existingFolders,
     isLoading,
     isUploading,
 
     title,
     alt,
     file,
+    folder,
     setTitle,
     setAlt,
     setFile,
+    setFolder,
+    handleFolderChange,
 
     copiedAssetKey,
     handleCopyUrl,
@@ -154,6 +185,7 @@ export function useAssets() {
     editingAsset,
     editTitle,
     editAlt,
+
     setEditTitle,
     setEditAlt,
     startEditing,

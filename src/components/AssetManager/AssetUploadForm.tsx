@@ -1,13 +1,15 @@
-import { useRef } from 'react'
 import styles from '@/pages/index.module.scss'
 import { Button, TextInput, Text } from '@/components'
 
 type AssetUploadFormProps = {
   title: string
   alt: string
+  folder: string
+  existingFolders: string[]
   isUploading: boolean
   onTitleChange: (value: string) => void
   onAltChange: (value: string) => void
+  onFolderChange: (value: string) => void
   onFileChange: (file: File | null) => void
   onSubmit: (event: React.FormEvent<HTMLFormElement>) => void
   isSubmitDisabled: boolean
@@ -17,22 +19,19 @@ type AssetUploadFormProps = {
 export function AssetUploadForm({
   title,
   alt,
+  folder,
+  existingFolders,
   isUploading,
   onTitleChange,
   onAltChange,
+  onFolderChange,
   onFileChange,
   onSubmit,
   isSubmitDisabled,
   errorMessage,
 }: AssetUploadFormProps) {
-  const fileInputRef = useRef<HTMLInputElement | null>(null)
-
-  async function handleFormSubmit(event: React.FormEvent<HTMLFormElement>) {
-    await onSubmit(event)
-
-    if (fileInputRef.current) {
-      fileInputRef.current.value = ''
-    }
+  function handleFormSubmit(event: React.FormEvent<HTMLFormElement>) {
+    onSubmit(event)
   }
 
   return (
@@ -52,11 +51,24 @@ export function AssetUploadForm({
             defaultValue={alt}
             onChange={(event) => onAltChange(event.target.value)}
           />
+
+          <TextInput
+            name="folder"
+            label="Ordner"
+            defaultValue={folder}
+            onChange={(event) => onFolderChange(event.target.value)}
+          />
         </div>
+
+        {existingFolders.length > 0 && (
+          <div className={styles.folderHint}>
+            <Text>Bestehende Ordner: {existingFolders.join(', ')}</Text>
+          </div>
+        )}
+
         <div className={styles.fileField}>
           <label htmlFor="file">Bild</label>
           <input
-            ref={fileInputRef}
             id="file"
             name="file"
             type="file"
@@ -66,6 +78,7 @@ export function AssetUploadForm({
             }}
           />
         </div>
+
         <div className={styles.formActions}>
           <Button
             type="submit"
@@ -76,7 +89,12 @@ export function AssetUploadForm({
           </Button>
         </div>
       </form>
-      {errorMessage && <Text>{errorMessage}</Text>}
+
+      {errorMessage && (
+        <div className={styles.formError}>
+          <Text>{errorMessage}</Text>
+        </div>
+      )}
     </>
   )
 }

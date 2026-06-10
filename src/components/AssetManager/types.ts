@@ -6,4 +6,5 @@ export type Asset = {
   url: string
   uploadedAt: string
   updatedAt?: string
+  folder?: string
 }
