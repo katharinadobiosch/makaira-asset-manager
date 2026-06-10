@@ -6,6 +6,7 @@ import path from 'node:path'
 import { createAssetKey } from '@/server/s3/createAssetKey'
 import { s3Env } from '@/server/s3/env'
 import { uploadAsset } from '@/server/s3/uploadAsset'
+import { validateFolderName } from '@/components/AssetManager/utils/folderValidation'
 
 export const config = {
   api: {
@@ -16,6 +17,7 @@ export const config = {
 type FormFields = {
   title?: string[]
   alt?: string[]
+  folder?: string[]
 }
 
 export default async function handler(
@@ -32,21 +34,32 @@ export default async function handler(
 
   const title = (fields as FormFields).title?.[0]
   const alt = (fields as FormFields).alt?.[0]
+  const folder = (fields as FormFields).folder?.[0]
   const file = Array.isArray(files.file) ? files.file[0] : files.file
 
-  if (!title || !alt || !file) {
+  if (!title || !alt || !folder || !file) {
     return res.status(400).json({
-      message: 'Missing title, alt or file',
+      message: 'Missing title, alt, folder or file',
+    })
+  }
+
+  const folderValidationError = validateFolderName(folder)
+
+  if (folderValidationError) {
+    return res.status(400).json({
+      message: folderValidationError,
     })
   }
 
   const fileBuffer = await fs.readFile(file.filepath)
   const extension = path.extname(file.originalFilename ?? '').replace('.', '')
 
+  const folderPrefix = `${s3Env.prefix}/${folder}`
+
   const imageKey = createAssetKey({
     title,
     extension,
-    prefix: s3Env.prefix,
+    prefix: folderPrefix,
   })
 
   const imageUpload = await uploadAsset({
@@ -60,6 +73,7 @@ export default async function handler(
   const metadata = {
     title,
     alt,
+    folder,
     imageKey,
     metadataKey,
     url: imageUpload.url,

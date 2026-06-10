@@ -44,6 +44,11 @@ export function AssetTable({
         <Column title="Alt-Text" dataIndex="alt" />
 
         <Column
+          title="Ordner"
+          render={(asset: Asset) => asset.folder || 'Ohne Ordner'}
+        />
+
+        <Column
           title="URL"
           render={(asset: Asset) => (
             <a href={asset.url} target="_blank" rel="noreferrer">
