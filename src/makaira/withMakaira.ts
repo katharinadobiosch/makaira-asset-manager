@@ -8,8 +8,8 @@ type IncomingPageServerSideProp<P> = (
 ) => Promise<GetServerSidePropsResult<P>>
 
 /**
- * Using for APP with install in single Makaira's instance and
- * provided SECRET, SLUG via Environment instead of store in db
+ * Handles Makaira app authentication for a single instance using
+ * SECRET and SLUG environment variables instead of database-stored credentials.
  *
  * @param incomingGSSP
  * @returns
@@ -23,11 +23,18 @@ export function withMakaira<T>(
     const url = new URL(ctx.req.url ?? '', `https://${ctx.req.headers.host}`)
     let secretProps = null
 
-    if (
-      process.env.MAKAIRA_APP_SECRET_CONTENT_WIDGET ||
-      process.env.MAKAIRA_APP_SECRET_CONTENT_MODAL ||
-      process.env.MAKAIRA_APP_SECRET
-    ) {
+    const hasDefaultAppEnv =
+      process.env.MAKAIRA_APP_SECRET && process.env.MAKAIRA_APP_SLUG
+
+    const hasContentWidgetEnv =
+      process.env.MAKAIRA_APP_SECRET_CONTENT_WIDGET &&
+      process.env.MAKAIRA_APP_SLUG_CONTENT_WIDGET
+
+    const hasContentModalEnv =
+      process.env.MAKAIRA_APP_SECRET_CONTENT_MODAL &&
+      process.env.MAKAIRA_APP_SLUG_CONTENT_MODAL
+
+    if (hasDefaultAppEnv || hasContentWidgetEnv || hasContentModalEnv) {
       console.debug(
         '[Asset Manager]: Process app auth with single vendor from ENV'
       )
@@ -41,7 +48,7 @@ export function withMakaira<T>(
         })
       } catch (error) {
         console.error(
-          '[Asset Manager]: Failed to process Makaira single-vendor auth from environment variables',
+          '[Asset Manager]: Failed to process Makaira single-vendor auth. Missing or invalid env variables.',
           error
         )
       }
@@ -52,7 +59,6 @@ export function withMakaira<T>(
             permanent: false,
             destination: '/bad-auth',
           },
-          props: {} as any,
         }
       }
     } else {
@@ -65,7 +71,6 @@ export function withMakaira<T>(
           permanent: false,
           destination: '/bad-auth',
         },
-        props: {} as any,
       }
     }
 
