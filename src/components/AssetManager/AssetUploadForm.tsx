@@ -57,16 +57,9 @@ export function AssetUploadForm({
             <input
               id="folder"
               name="folder"
-              list="existing-folders"
-              defaultValue={folder}
+              value={folder}
               onChange={(event) => onFolderChange(event.target.value)}
             />
-
-            <datalist id="existing-folders">
-              {existingFolders.map((folder) => (
-                <option key={folder} value={folder} />
-              ))}
-            </datalist>
           </div>
         </div>
 
@@ -75,8 +68,15 @@ export function AssetUploadForm({
             <Text>Bestehende Ordner:</Text>
 
             <div className={styles.folderBadges}>
-              {existingFolders.map((folder) => (
-                <Badge key={folder} type="secondary" text={folder} />
+              {existingFolders.map((existingFolder) => (
+                <button
+                  key={existingFolder}
+                  type="button"
+                  className={styles.folderBadgeButton}
+                  onClick={() => onFolderChange(existingFolder)}
+                >
+                  <Badge type="secondary" text={existingFolder} />
+                </button>
               ))}
             </div>
           </div>

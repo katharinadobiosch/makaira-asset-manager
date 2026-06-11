@@ -1,4 +1,5 @@
 import styles from '@/pages/index.module.scss'
+import { AutoComplete } from '@/components'
 
 type AssetFolderFilterProps = {
   folders: string[]
@@ -15,23 +16,29 @@ export function AssetFolderFilter({
     return null
   }
 
+  const options = [
+    {
+      value: '',
+      label: 'Alle Ordner',
+    },
+    ...folders.map((folder) => ({
+      value: folder,
+      label: folder,
+    })),
+  ]
+
   return (
     <div className={styles.folderFilter}>
-      <label htmlFor="folder-filter">Ordner filtern</label>
-
-      <select
-        id="folder-filter"
-        value={selectedFolder}
-        onChange={(event) => onFolderChange(event.target.value)}
-      >
-        <option value="">Alle Ordner</option>
-
-        {folders.map((folder) => (
-          <option key={folder} value={folder}>
-            {folder}
-          </option>
-        ))}
-      </select>
+      <AutoComplete
+        title="Ordner filtern"
+        placeholder="Alle Ordner"
+        allowClear
+        value={selectedFolder || undefined}
+        options={options}
+        onChange={(value) => {
+          onFolderChange(String(value ?? ''))
+        }}
+      />
     </div>
   )
 }
