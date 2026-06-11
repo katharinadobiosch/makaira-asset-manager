@@ -52,12 +52,22 @@ export function AssetUploadForm({
             onChange={(event) => onAltChange(event.target.value)}
           />
 
-          <TextInput
-            name="folder"
-            label="Ordner"
-            defaultValue={folder}
-            onChange={(event) => onFolderChange(event.target.value)}
-          />
+          <div className={styles.folderField}>
+            <label htmlFor="folder">Ordner</label>
+            <input
+              id="folder"
+              name="folder"
+              list="existing-folders"
+              defaultValue={folder}
+              onChange={(event) => onFolderChange(event.target.value)}
+            />
+
+            <datalist id="existing-folders">
+              {existingFolders.map((folder) => (
+                <option key={folder} value={folder} />
+              ))}
+            </datalist>
+          </div>
         </div>
 
         {existingFolders.length > 0 && (
