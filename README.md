@@ -21,7 +21,7 @@ npm run dev
 App lokal öffnen:
 
 ```txt
-http://localhost:80?appType=app
+http://localhost:3000?appType=app
 ```
 
 ## Benötigte ENV Variablen
@@ -77,7 +77,7 @@ MAKAIRA_APP_SLUG=
 Then open locally with:
 
 ```txt
-http://localhost:80slug?appType=app
+http://localhost:3000bws-asset-manager-dev?appType=app
 ```
 
 ## Makaira Docs

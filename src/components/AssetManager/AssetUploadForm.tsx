@@ -1,5 +1,5 @@
 import styles from '@/pages/index.module.scss'
-import { Button, TextInput, Text } from '@/components'
+import { Button, TextInput, Text, Badge } from '@/components'
 
 type AssetUploadFormProps = {
   title: string
@@ -72,7 +72,13 @@ export function AssetUploadForm({
 
         {existingFolders.length > 0 && (
           <div className={styles.folderHint}>
-            <Text>Bestehende Ordner: {existingFolders.join(', ')}</Text>
+            <Text>Bestehende Ordner:</Text>
+
+            <div className={styles.folderBadges}>
+              {existingFolders.map((folder) => (
+                <Badge key={folder} type="secondary" text={folder} />
+              ))}
+            </div>
           </div>
         )}
 
