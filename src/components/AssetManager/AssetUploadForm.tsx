@@ -88,16 +88,21 @@ export function AssetUploadForm({
             )}
 
             <div className={styles.fileField}>
-              <Button
-                type="button"
-                variant="secondary"
-                level={1}
-                icon={FaUpload}
-                iconPosition="left"
-                onClick={() => fileInputRef.current?.click()}
-              >
-                Datei auswählen
-              </Button>
+              <div className={styles.filePickerRow}>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  level={1}
+                  icon={FaUpload}
+                  iconPosition="left"
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  Datei auswählen
+                </Button>
+                <Text size="bravo" element="span" className={styles.fileName}>
+                  {file ? file.name : 'Keine Datei ausgewählt'}
+                </Text>
+              </div>
               <input
                 ref={fileInputRef}
                 id="file"
@@ -109,9 +114,6 @@ export function AssetUploadForm({
                   onFileChange(event.target.files?.[0] ?? null)
                 }}
               />
-              <Text size="bravo">
-                {file ? file.name : 'Keine Datei ausgewählt'}
-              </Text>
             </div>
 
             <div className={styles.formActions}>

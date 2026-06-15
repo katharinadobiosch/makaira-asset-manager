@@ -78,6 +78,18 @@
   gap: 8px;
 }
 
+.filePickerRow {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  max-width: 100%;
+}
+
+.fileName {
+  color: var(--neutral-70);
+}
+
 .folderHint + .fileField {
   margin-top: 16px;
 }
