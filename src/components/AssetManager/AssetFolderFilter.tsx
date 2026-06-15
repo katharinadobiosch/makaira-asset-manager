@@ -1,5 +1,5 @@
 import styles from '@/pages/index.module.scss'
-import { AutoComplete } from '@/components'
+import { Badge, Text } from '@/components'
 
 type AssetFolderFilterProps = {
   folders: string[]
@@ -12,33 +12,36 @@ export function AssetFolderFilter({
   selectedFolder,
   onFolderChange,
 }: AssetFolderFilterProps) {
-  if (folders.length === 0) {
-    return null
-  }
-
-  const options = [
-    {
-      value: '',
-      label: 'Alle Ordner',
-    },
-    ...folders.map((folder) => ({
-      value: folder,
-      label: folder,
-    })),
-  ]
+  if (folders.length === 0) return null
 
   return (
     <div className={styles.folderFilter}>
-      <AutoComplete
-        title="Ordner filtern"
-        placeholder="Alle Ordner"
-        allowClear
-        value={selectedFolder || undefined}
-        options={options}
-        onChange={(value) => {
-          onFolderChange(String(value ?? ''))
-        }}
-      />
+      <Text>Ordner filtern:</Text>
+      <div className={styles.folderBadges}>
+        <button
+          type="button"
+          className={styles.folderBadgeButton}
+          onClick={() => onFolderChange('')}
+        >
+          <Badge
+            type={selectedFolder === '' ? 'primary' : 'secondary'}
+            text="Alle"
+          />
+        </button>
+        {folders.map((folder) => (
+          <button
+            key={folder}
+            type="button"
+            className={styles.folderBadgeButton}
+            onClick={() => onFolderChange(folder)}
+          >
+            <Badge
+              type={selectedFolder === folder ? 'primary' : 'secondary'}
+              text={folder}
+            />
+          </button>
+        ))}
+      </div>
     </div>
   )
 }

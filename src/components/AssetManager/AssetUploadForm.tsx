@@ -1,5 +1,6 @@
 import styles from '@/pages/index.module.scss'
-import { Button, TextInput, Text, Badge } from '@/components'
+import { Button, TextInput, Text, Badge, Collapse, Panel } from '@/components'
+import { FaUpload } from 'react-icons/fa'
 
 type AssetUploadFormProps = {
   title: string
@@ -36,81 +37,97 @@ export function AssetUploadForm({
 
   return (
     <>
-      <form onSubmit={handleFormSubmit} className={styles.uploadForm}>
-        <div className={styles.formGrid}>
-          <TextInput
-            name="title"
-            label="Titel"
-            defaultValue={title}
-            onChange={(event) => onTitleChange(event.target.value)}
-          />
-
-          <TextInput
-            name="alt"
-            label="Alt-Text"
-            defaultValue={alt}
-            onChange={(event) => onAltChange(event.target.value)}
-          />
-
-          <div className={styles.folderField}>
-            <label htmlFor="folder">Ordner</label>
-            <input
-              id="folder"
-              name="folder"
-              value={folder}
-              onChange={(event) => onFolderChange(event.target.value)}
-            />
-          </div>
-        </div>
-
-        {existingFolders.length > 0 && (
-          <div className={styles.folderHint}>
-            <Text>Bestehende Ordner:</Text>
-
-            <div className={styles.folderBadges}>
-              {existingFolders.map((existingFolder) => (
-                <button
-                  key={existingFolder}
-                  type="button"
-                  className={styles.folderBadgeButton}
-                  onClick={() => onFolderChange(existingFolder)}
-                >
-                  <Badge type="secondary" text={existingFolder} />
-                </button>
-              ))}
+      <Collapse type="arrow" title="Bild hochladen">
+        <Panel header="Bild hochladen" type="arrow">
+          <form onSubmit={handleFormSubmit} className={styles.uploadForm}>
+            <div className={styles.formGrid}>
+              <TextInput
+                name="title"
+                label="Titel"
+                defaultValue={title}
+                onChange={(event) => onTitleChange(event.target.value)}
+              />
+              <TextInput
+                name="alt"
+                label="Alt-Text"
+                defaultValue={alt}
+                onChange={(event) => onAltChange(event.target.value)}
+              />
+              <div className={styles.folderField}>
+                <label htmlFor="folder">Ordner</label>
+                <input
+                  id="folder"
+                  name="folder"
+                  value={folder}
+                  onChange={(event) => onFolderChange(event.target.value)}
+                />
+              </div>
             </div>
-          </div>
-        )}
 
-        <div className={styles.fileField}>
-          <label htmlFor="file">Bild</label>
-          <input
-            id="file"
-            name="file"
-            type="file"
-            accept="image/*"
-            onChange={(event) => {
-              onFileChange(event.target.files?.[0] ?? null)
-            }}
-          />
-        </div>
+            {existingFolders.length > 0 && (
+              <div className={styles.folderHint}>
+                <Text>Bestehende Ordner:</Text>
+                <div className={styles.folderBadges}>
+                  {existingFolders.map((existingFolder) => (
+                    <button
+                      key={existingFolder}
+                      type="button"
+                      className={styles.folderBadgeButton}
+                      onClick={() => onFolderChange(existingFolder)}
+                    >
+                      <Badge type="secondary" text={existingFolder} />
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
 
-        <div className={styles.formActions}>
-          <Button
-            type="submit"
-            loading={isUploading}
-            disabled={isSubmitDisabled}
-          >
-            {isUploading ? 'Bild wird hochgeladen...' : 'Bild hochladen'}
-          </Button>
-        </div>
-      </form>
+            <div className={styles.fileField}>
+              <label htmlFor="file">Bild</label>
+              <input
+                id="file"
+                name="file"
+                type="file"
+                accept="image/*"
+                onChange={(event) => {
+                  onFileChange(event.target.files?.[0] ?? null)
+                }}
+              />
+            </div>
 
-      {errorMessage && (
-        <div className={styles.formError}>
-          <Text>{errorMessage}</Text>
-        </div>
-      )}
+            <div className={styles.formActions}>
+              <Button
+                type="submit"
+                icon={isUploading ? undefined : FaUpload}
+                iconPosition="left"
+                loading={isUploading}
+                disabled={isSubmitDisabled}
+              >
+                {isUploading ? 'Wird hochgeladen...' : 'Bild hochladen'}
+              </Button>
+
+              {isUploading && (
+                <Badge
+                  spin
+                  icon={FaSpinner}
+                  type="secondary"
+                  text="Upload läuft..."
+                />
+              )}
+            </div>
+          </form>
+
+          {errorMessage && (
+            <div className={styles.formError}>
+              <Badge
+                type="primary"
+                text={errorMessage}
+                icon={FaExclamationCircle}
+              />
+            </div>
+          )}
+        </Panel>
+      </Collapse>
     </>
   )
 }

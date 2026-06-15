@@ -1,7 +1,8 @@
 import Image from 'next/image'
+import { FaCopy, FaCheck, FaEdit, FaTrash } from 'react-icons/fa'
 
 import styles from '@/pages/index.module.scss'
-import { Button, Column, Table } from '@/components'
+import { Button, Column, Table, Tooltip } from '@/components'
 import { Asset } from './types'
 
 type AssetTableProps = {
@@ -66,21 +67,38 @@ export function AssetTable({
           title="Aktion"
           render={(asset: Asset) => (
             <div style={{ display: 'flex', gap: 8 }}>
-              <div style={{ width: 130 }}>
-                <Button variant="secondary" onClick={() => onCopyUrl(asset)}>
-                  {copiedAssetKey === asset.imageKey
-                    ? 'Kopiert!'
-                    : 'URL kopieren'}
-                </Button>
-              </div>
+              <Tooltip
+                placement="top"
+                overlay={
+                  <span>
+                    {copiedAssetKey === asset.imageKey
+                      ? 'Kopiert!'
+                      : 'URL kopieren'}
+                  </span>
+                }
+              >
+                <Button
+                  variant="secondary"
+                  icon={copiedAssetKey === asset.imageKey ? FaCheck : FaCopy}
+                  onClick={() => onCopyUrl(asset)}
+                />
+              </Tooltip>
 
-              <Button variant="secondary" onClick={() => onEdit(asset)}>
-                Bearbeiten
-              </Button>
+              <Tooltip placement="top" overlay={<span>Bearbeiten</span>}>
+                <Button
+                  variant="secondary"
+                  icon={FaEdit}
+                  onClick={() => onEdit(asset)}
+                />
+              </Tooltip>
 
-              <Button variant="secondary" onClick={() => onDelete(asset)}>
-                Löschen
-              </Button>
+              <Tooltip placement="top" overlay={<span>Löschen</span>}>
+                <Button
+                  variant="secondary"
+                  icon={FaTrash}
+                  onClick={() => onDelete(asset)}
+                />
+              </Tooltip>
             </div>
           )}
         />
