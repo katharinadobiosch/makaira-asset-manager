@@ -60,6 +60,7 @@ export default function Home() {
         key={uploadFormKey}
         title={title}
         alt={alt}
+        file={file}
         isUploading={isUploading}
         onTitleChange={setTitle}
         onAltChange={setAlt}

@@ -14,33 +14,31 @@ export function AssetFolderFilter({
 }: AssetFolderFilterProps) {
   if (folders.length === 0) return null
 
+  function renderFolderBadge(folder: string, label: string) {
+    const isActive = selectedFolder === folder
+
+    return (
+      <button
+        key={folder || 'all'}
+        type="button"
+        className={`${styles.folderBadgeButton} ${
+          isActive
+            ? styles.folderBadgeButtonActive
+            : styles.folderBadgeButtonInactive
+        }`}
+        onClick={() => onFolderChange(folder)}
+      >
+        <Badge type={isActive ? 'primary' : 'secondary'} text={label} />
+      </button>
+    )
+  }
+
   return (
     <div className={styles.folderFilter}>
       <Text>Ordner filtern:</Text>
       <div className={styles.folderBadges}>
-        <button
-          type="button"
-          className={styles.folderBadgeButton}
-          onClick={() => onFolderChange('')}
-        >
-          <Badge
-            type={selectedFolder === '' ? 'primary' : 'secondary'}
-            text="Alle"
-          />
-        </button>
-        {folders.map((folder) => (
-          <button
-            key={folder}
-            type="button"
-            className={styles.folderBadgeButton}
-            onClick={() => onFolderChange(folder)}
-          >
-            <Badge
-              type={selectedFolder === folder ? 'primary' : 'secondary'}
-              text={folder}
-            />
-          </button>
-        ))}
+        {renderFolderBadge('', 'Alle')}
+        {folders.map((folder) => renderFolderBadge(folder, folder))}
       </div>
     </div>
   )

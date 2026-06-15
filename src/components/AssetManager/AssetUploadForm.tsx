@@ -1,10 +1,12 @@
+import { useRef } from 'react'
 import styles from '@/pages/index.module.scss'
 import { Button, TextInput, Text, Badge, Collapse, Panel } from '@/components'
-import { FaUpload } from 'react-icons/fa'
+import { FaUpload, FaSpinner, FaExclamationCircle } from 'react-icons/fa'
 
 type AssetUploadFormProps = {
   title: string
   alt: string
+  file: File | null
   folder: string
   existingFolders: string[]
   isUploading: boolean
@@ -20,6 +22,7 @@ type AssetUploadFormProps = {
 export function AssetUploadForm({
   title,
   alt,
+  file,
   folder,
   existingFolders,
   isUploading,
@@ -31,6 +34,8 @@ export function AssetUploadForm({
   isSubmitDisabled,
   errorMessage,
 }: AssetUploadFormProps) {
+  const fileInputRef = useRef<HTMLInputElement | null>(null)
+
   function handleFormSubmit(event: React.FormEvent<HTMLFormElement>) {
     onSubmit(event)
   }
@@ -38,7 +43,7 @@ export function AssetUploadForm({
   return (
     <>
       <Collapse type="arrow" title="Bild hochladen">
-        <Panel header="Bild hochladen" type="arrow">
+        <Panel type="arrow">
           <form onSubmit={handleFormSubmit} className={styles.uploadForm}>
             <div className={styles.formGrid}>
               <TextInput
@@ -84,15 +89,30 @@ export function AssetUploadForm({
 
             <div className={styles.fileField}>
               <label htmlFor="file">Bild</label>
+              <Button
+                type="button"
+                variant="secondary"
+                level={1}
+                icon={FaUpload}
+                iconPosition="left"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                Datei auswählen
+              </Button>
               <input
+                ref={fileInputRef}
                 id="file"
                 name="file"
                 type="file"
                 accept="image/*"
+                hidden
                 onChange={(event) => {
                   onFileChange(event.target.files?.[0] ?? null)
                 }}
               />
+              <Text size="bravo">
+                {file ? file.name : 'Keine Datei ausgewählt'}
+              </Text>
             </div>
 
             <div className={styles.formActions}>

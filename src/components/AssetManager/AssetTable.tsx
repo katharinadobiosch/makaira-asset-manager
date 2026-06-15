@@ -1,5 +1,11 @@
 import Image from 'next/image'
-import { FaCopy, FaCheck, FaEdit, FaTrash } from 'react-icons/fa'
+import {
+  FaCopy,
+  FaCheck,
+  FaEdit,
+  FaTrash,
+  FaExternalLinkAlt,
+} from 'react-icons/fa'
 
 import styles from '@/pages/index.module.scss'
 import { Button, Column, Table, Tooltip } from '@/components'
@@ -52,9 +58,13 @@ export function AssetTable({
         <Column
           title="URL"
           render={(asset: Asset) => (
-            <a href={asset.url} target="_blank" rel="noreferrer">
-              öffnen
-            </a>
+            <Button
+              variant="secondary"
+              icon={FaExternalLinkAlt}
+              onClick={() =>
+                window.open(asset.url, '_blank', 'noopener,noreferrer')
+              }
+            />
           )}
         />
 
@@ -67,16 +77,7 @@ export function AssetTable({
           title="Aktion"
           render={(asset: Asset) => (
             <div style={{ display: 'flex', gap: 8 }}>
-              <Tooltip
-                placement="top"
-                overlay={
-                  <span>
-                    {copiedAssetKey === asset.imageKey
-                      ? 'Kopiert!'
-                      : 'URL kopieren'}
-                  </span>
-                }
-              >
+              <Tooltip placement="top" overlay={<span>URL kopieren</span>}>
                 <Button
                   variant="secondary"
                   icon={copiedAssetKey === asset.imageKey ? FaCheck : FaCopy}

@@ -48,6 +48,7 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
+  grid-column: 1 / -1;
 }
 
 .folderField label {
@@ -69,10 +70,27 @@
   border: 0;
   background: transparent;
   cursor: pointer;
+  transition: opacity 0.2s ease;
 }
 
 .folderBadgeButton:hover {
   opacity: 0.8;
+}
+
+.folderBadgeButtonActive {
+  opacity: 1;
+}
+
+.folderBadgeButtonActive:hover {
+  opacity: 1;
+}
+
+.folderBadgeButtonInactive {
+  opacity: 0.65;
+}
+
+.folderBadgeButtonInactive:hover {
+  opacity: 0.85;
 }
 
 .folderFilter {
