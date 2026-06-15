@@ -1,5 +1,7 @@
 .thumbnail {
   border-radius: 8px;
+  display: block;
+  object-fit: cover;
 }
 
 .formGrid {
@@ -16,16 +18,52 @@
   margin-bottom: 16px;
 }
 
-.uploadCollapse {
+.uploadSection {
+  background: var(--neutral-00);
+  border: 1px solid var(--neutral-20);
+  border-radius: 0.8rem;
+  padding: var(--spacer-xxs);
   margin-bottom: 32px;
 }
 
+.uploadCollapse {
+  border-radius: 0.8rem;
+}
+
 .formActions {
-  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .assetTable {
+  :global {
+    .makaira-table-tbody .makaira-table-row {
+      height: auto;
+      min-height: 10.4rem;
+    }
+
+    .makaira-table-tbody .makaira-table-cell {
+      vertical-align: middle;
+      padding-top: var(--spacer-xxs);
+      padding-bottom: var(--spacer-xxs);
+    }
+  }
+}
+
+.assetTableWrap {
   margin-top: 24px;
+}
+
+.urlAction {
+  display: flex;
+  align-items: center;
+}
+
+.rowActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .formError {
@@ -126,6 +164,20 @@
 .folderFilter {
   width: 320px;
   margin: 20px 0 16px;
+}
+
+.assetToolbar {
+  display: grid;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+.assetToolbar .folderFilter {
+  margin: 0;
+}
+
+.assetSearchWrap {
+  width: 100%;
 }
 
 .folderFilter :global(.rc-select) {

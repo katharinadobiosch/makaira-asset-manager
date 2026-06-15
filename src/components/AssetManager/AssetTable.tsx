@@ -29,81 +29,82 @@ export function AssetTable({
   formatDate,
 }: AssetTableProps) {
   return (
-    <div className={styles.assetTable}>
-      <Table data={assets}>
-        <Column
-          title="Bild"
-          render={(asset: Asset) => (
-            <Image
-              className={styles.thumbnail}
-              src={asset.url}
-              alt={asset.alt}
-              width={120}
-              height={120}
-              style={{
-                objectFit: 'cover',
-              }}
-            />
-          )}
-        />
+    <div className={styles.assetTableWrap}>
+      <div className={styles.assetTable}>
+        <Table data={assets}>
+          <Column
+            title="Bild"
+            render={(asset: Asset) => (
+              <Image
+                className={styles.thumbnail}
+                src={asset.url}
+                alt={asset.alt}
+                width={96}
+                height={96}
+              />
+            )}
+          />
 
-        <Column title="Titel" dataIndex="title" />
-        <Column title="Alt-Text" dataIndex="alt" />
+          <Column title="Titel" dataIndex="title" />
+          <Column title="Alt-Text" dataIndex="alt" />
 
-        <Column
-          title="Ordner"
-          render={(asset: Asset) => asset.folder || 'Ohne Ordner'}
-        />
+          <Column
+            title="Ordner"
+            render={(asset: Asset) => asset.folder || 'Ohne Ordner'}
+          />
 
-        <Column
-          title="URL"
-          render={(asset: Asset) => (
-            <Button
-              variant="secondary"
-              icon={FaExternalLinkAlt}
-              onClick={() =>
-                window.open(asset.url, '_blank', 'noopener,noreferrer')
-              }
-            />
-          )}
-        />
-
-        <Column
-          title="Upload"
-          render={(asset: Asset) => formatDate(asset.uploadedAt)}
-        />
-
-        <Column
-          title="Aktion"
-          render={(asset: Asset) => (
-            <div style={{ display: 'flex', gap: 8 }}>
-              <Tooltip placement="top" overlay={<span>URL kopieren</span>}>
+          <Column
+            title="URL"
+            render={(asset: Asset) => (
+              <div className={styles.urlAction}>
                 <Button
                   variant="secondary"
-                  icon={copiedAssetKey === asset.imageKey ? FaCheck : FaCopy}
-                  onClick={() => onCopyUrl(asset)}
+                  icon={FaExternalLinkAlt}
+                  onClick={() =>
+                    window.open(asset.url, '_blank', 'noopener,noreferrer')
+                  }
                 />
-              </Tooltip>
+              </div>
+            )}
+          />
 
-              <Tooltip placement="top" overlay={<span>Bearbeiten</span>}>
-                <Button
-                  variant="secondary"
-                  icon={FaEdit}
-                  onClick={() => onEdit(asset)}
-                />
-              </Tooltip>
+          <Column
+            title="Upload"
+            render={(asset: Asset) => formatDate(asset.uploadedAt)}
+          />
 
-              <Tooltip placement="top" overlay={<span>Löschen</span>}>
-                <Button
-                  variant="secondary"
-                  icon={FaTrash}
-                  onClick={() => onDelete(asset)}
-                />
-              </Tooltip>
-            </div>
-          )}
-        />
-      </Table>
+          <Column
+            title="Aktion"
+            render={(asset: Asset) => (
+              <div className={styles.rowActions}>
+                <Tooltip placement="top" overlay={<span>URL kopieren</span>}>
+                  <Button
+                    variant="secondary"
+                    icon={copiedAssetKey === asset.imageKey ? FaCheck : FaCopy}
+                    onClick={() => onCopyUrl(asset)}
+                  />
+                </Tooltip>
+
+                <Tooltip placement="top" overlay={<span>Bearbeiten</span>}>
+                  <Button
+                    variant="secondary"
+                    icon={FaEdit}
+                    onClick={() => onEdit(asset)}
+                  />
+                </Tooltip>
+
+                <Tooltip placement="top" overlay={<span>Löschen</span>}>
+                  <Button
+                    variant="secondary"
+                    icon={FaTrash}
+                    onClick={() => onDelete(asset)}
+                  />
+                </Tooltip>
+              </div>
+            )}
+          />
+        </Table>
+      </div>
     </div>
   )
 }

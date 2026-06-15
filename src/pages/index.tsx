@@ -1,5 +1,6 @@
 import { withMakaira } from '@/makaira/withMakaira'
 import { PageWrapper, Text } from '@/components'
+import styles from '@/pages/index.module.scss'
 import {
   AssetSearch,
   AssetTable,
@@ -96,13 +97,19 @@ export default function Home() {
 
       {isLoading && <Text>Lade Assets...</Text>}
 
-      <AssetFolderFilter
-        folders={existingFolders}
-        selectedFolder={selectedFolder}
-        onFolderChange={setSelectedFolder}
-      />
+      <div className={styles.assetToolbar}>
+        <AssetFolderFilter
+          folders={existingFolders}
+          selectedFolder={selectedFolder}
+          onFolderChange={setSelectedFolder}
+        />
 
-      {!isLoading && <AssetSearch search={search} onSearchChange={setSearch} />}
+        {!isLoading && (
+          <div className={styles.assetSearchWrap}>
+            <AssetSearch search={search} onSearchChange={setSearch} />
+          </div>
+        )}
+      </div>
 
       {!isLoading && assets.length === 0 && (
         <Text>Noch keine Assets vorhanden.</Text>
