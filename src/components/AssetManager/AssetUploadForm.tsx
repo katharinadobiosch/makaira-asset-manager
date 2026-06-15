@@ -42,8 +42,8 @@ export function AssetUploadForm({
 
   return (
     <>
-      <Collapse type="arrow" title="Bild hochladen">
-        <Panel type="arrow">
+      <Collapse type="arrow" className={styles.uploadCollapse}>
+        <Panel type="arrow" header="Bild hochladen">
           <form onSubmit={handleFormSubmit} className={styles.uploadForm}>
             <div className={styles.formGrid}>
               <TextInput
@@ -88,7 +88,6 @@ export function AssetUploadForm({
             )}
 
             <div className={styles.fileField}>
-              <label htmlFor="file">Bild</label>
               <Button
                 type="button"
                 variant="secondary"
@@ -105,7 +104,7 @@ export function AssetUploadForm({
                 name="file"
                 type="file"
                 accept="image/*"
-                hidden
+                className={styles.fileInputHidden}
                 onChange={(event) => {
                   onFileChange(event.target.files?.[0] ?? null)
                 }}
