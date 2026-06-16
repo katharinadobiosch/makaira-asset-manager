@@ -81,6 +81,8 @@ export function AssetTable({
                   <Button
                     variant="secondary"
                     icon={copiedAssetKey === asset.imageKey ? FaCheck : FaCopy}
+                    aria-label="URL öffnen"
+                    title="URL öffnen"
                     onClick={() => onCopyUrl(asset)}
                   />
                 </Tooltip>
@@ -89,6 +91,8 @@ export function AssetTable({
                   <Button
                     variant="secondary"
                     icon={FaEdit}
+                    aria-label="Bearbeiten"
+                    title="Bearbeiten"
                     onClick={() => onEdit(asset)}
                   />
                 </Tooltip>
@@ -97,6 +101,8 @@ export function AssetTable({
                   <Button
                     variant="secondary"
                     icon={FaTrash}
+                    aria-label="Löschen"
+                    title="Löschen"
                     onClick={() => onDelete(asset)}
                   />
                 </Tooltip>

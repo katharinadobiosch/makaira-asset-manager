@@ -1,5 +1,10 @@
 import csx from 'classnames'
-import React, { ExoticComponent, Fragment, FunctionComponent, MouseEventHandler } from 'react'
+import React, {
+  ExoticComponent,
+  Fragment,
+  FunctionComponent,
+  MouseEventHandler,
+} from 'react'
 import { IconType } from 'react-icons/lib'
 
 import { Spinner, TooltipProps } from '@/components'
@@ -14,10 +19,10 @@ type ButtonProps = React.PropsWithChildren<{
   icon?: IconType
   variant?: 'secondary' | 'reduced' | 'primary'
   level?: -1 | 0 | 1
-  iconPosition?: 'right' | 'left',
-  tooltip?: string;
-  type?: 'button' | 'submit';
-  [key: string]: any;
+  iconPosition?: 'right' | 'left'
+  tooltip?: string
+  type?: 'button' | 'submit'
+  [key: string]: any
 }>
 
 const Button: FunctionComponent<ButtonProps> = ({
@@ -31,7 +36,8 @@ const Button: FunctionComponent<ButtonProps> = ({
   level = 0,
   iconPosition = 'right',
   tooltip,
-  type = "button",
+  type = 'button',
+  ...buttonProps
 }) => {
   const isIconOnly = !children && icon
   const classes = csx(
@@ -49,7 +55,7 @@ const Button: FunctionComponent<ButtonProps> = ({
   )
 
   const Icon = icon
-  let Wrapper: React.ElementType = Fragment;
+  let Wrapper: React.ElementType = Fragment
   let WrapperProps: any = {}
   if (tooltip) {
     Wrapper = Tooltip
@@ -59,13 +65,19 @@ const Button: FunctionComponent<ButtonProps> = ({
   return (
     <Wrapper {...WrapperProps}>
       <button
+        {...buttonProps}
         type={type}
         disabled={disabled || loading}
         onClick={onClick}
         className={classes}
       >
         <>
-          {loading && <Spinner className={csx(styles.icon, styles.spinner)} size="small" />}
+          {loading && (
+            <Spinner
+              className={csx(styles.icon, styles.spinner)}
+              size="small"
+            />
+          )}
 
           {children && <span>{children}</span>}
 

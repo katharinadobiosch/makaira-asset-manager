@@ -66,7 +66,9 @@ export default function Home() {
         onAltChange={setAlt}
         onFileChange={setFile}
         onSubmit={handleSubmit}
-        isSubmitDisabled={!title || !alt || !file || isUploading}
+        isSubmitDisabled={
+          !title || !alt || !file || !folder.trim() || isUploading
+        }
         errorMessage={errorMessage ?? undefined}
         folder={folder}
         existingFolders={existingFolders}

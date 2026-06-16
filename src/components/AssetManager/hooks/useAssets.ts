@@ -59,7 +59,11 @@ export function useAssets() {
       return
     }
 
-    const folderValidationError = validateFolderName(folder)
+        const normalizedFolder = folder.trim()
+
+
+    const folderValidationError = validateFolderName(normalizedFolder)
+
 
     if (folderValidationError) {
       setErrorMessage(folderValidationError)

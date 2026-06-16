@@ -43,7 +43,9 @@ export default async function handler(
     })
   }
 
-  const folderValidationError = validateFolderName(folder)
+  const normalizedFolder = folder.trim()
+
+  const folderValidationError = validateFolderName(normalizedFolder)
 
   if (folderValidationError) {
     return res.status(400).json({
