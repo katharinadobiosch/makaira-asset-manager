@@ -127,15 +127,6 @@ export function AssetUploadForm({
                 >
                   {isUploading ? 'Wird hochgeladen...' : 'Bild hochladen'}
                 </Button>
-
-                {isUploading && (
-                  <Badge
-                    spin
-                    icon={FaSpinner}
-                    type="secondary"
-                    text="Upload läuft..."
-                  />
-                )}
               </div>
             </form>
 
