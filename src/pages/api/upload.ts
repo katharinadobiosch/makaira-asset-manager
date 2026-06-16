@@ -56,7 +56,7 @@ export default async function handler(
   const fileBuffer = await fs.readFile(file.filepath)
   const extension = path.extname(file.originalFilename ?? '').replace('.', '')
 
-  const folderPrefix = `${s3Env.prefix}/${folder}`
+  const folderPrefix = `${s3Env.prefix}/${normalizedFolder}`
 
   const imageKey = createAssetKey({
     title,
@@ -75,7 +75,7 @@ export default async function handler(
   const metadata = {
     title,
     alt,
-    folder,
+    folder: normalizedFolder,
     imageKey,
     metadataKey,
     url: imageUpload.url,

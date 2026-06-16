@@ -53,17 +53,14 @@ export function useAssets() {
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
+    const normalizedFolder = folder.trim()
 
-    if (!title || !alt || !file || !folder) {
+    if (!title || !alt || !file || !normalizedFolder) {
       setErrorMessage('Bitte Titel, Alt-Text, Bild und Ordner ausfüllen.')
       return
     }
 
-        const normalizedFolder = folder.trim()
-
-
     const folderValidationError = validateFolderName(normalizedFolder)
-
 
     if (folderValidationError) {
       setErrorMessage(folderValidationError)
@@ -74,7 +71,7 @@ export function useAssets() {
     setErrorMessage(null)
 
     try {
-      await uploadAsset(title, alt, folder, file)
+      await uploadAsset(title, alt, normalizedFolder, file)
 
       setTitle('')
       setAlt('')
@@ -91,7 +88,8 @@ export function useAssets() {
   }
 
   function handleFolderChange(value: string) {
-    setFolder(value)
+    const normalizedFolder = value.trim()
+    setFolder(normalizedFolder)
 
     if (errorMessage) {
       setErrorMessage(null)
