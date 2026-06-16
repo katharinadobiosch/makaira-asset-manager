@@ -43,7 +43,6 @@ export default function Home() {
     file,
     uploadFormKey,
     folder,
-    setFolder,
     existingFolders,
     handleFolderChange,
     selectedFolder,

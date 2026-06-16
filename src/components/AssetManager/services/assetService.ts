@@ -13,7 +13,12 @@ export async function fetchAssets() {
   return data.assets as Asset[]
 }
 
-export async function uploadAsset(title: string, alt: string, folder: string, file: File) {
+export async function uploadAsset(
+  title: string,
+  alt: string,
+  folder: string,
+  file: File
+) {
   const formData = new FormData()
 
   formData.append('title', title)
@@ -29,7 +34,6 @@ export async function uploadAsset(title: string, alt: string, folder: string, fi
   if (!response.ok) {
     throw new Error('Upload failed')
   }
-  
 }
 
 export async function updateAsset(
