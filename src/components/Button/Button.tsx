@@ -1,13 +1,12 @@
 import csx from 'classnames'
 import React, {
-  ExoticComponent,
   Fragment,
   FunctionComponent,
   MouseEventHandler,
 } from 'react'
 import { IconType } from 'react-icons/lib'
 
-import { Spinner, TooltipProps } from '@/components'
+import { Spinner } from '@/components'
 import { Tooltip } from '@/components'
 import styles from '@/components/Button/Button.module.scss'
 
