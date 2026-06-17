@@ -20,4 +20,4 @@ jobs:
           GITLAB_TOKEN: ${{ secrets.GITLAB_ACCESS_TOKEN }}
           GITLAB_REMOTE_URL: ${{ secrets.GITLAB_REMOTE_URL }}
         run: |
-          git push --force https://oauth2:${GITLAB_TOKEN}@${GITLAB_REMOTE_URL#https://} stable:stable
+          git push --force https://oauth2:${GITLAB_TOKEN}@${GITLAB_REMOTE_URL#https://} stable:main
