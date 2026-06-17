@@ -77,7 +77,7 @@ MAKAIRA_APP_SLUG=
 Then open locally with:
 
 ```txt
-http://localhost:3000/bws-asset-manager-dev?appType=app
+http://localhost:3000/asset-manager-dev?appType=app
 ```
 
 ## Makaira Docs
