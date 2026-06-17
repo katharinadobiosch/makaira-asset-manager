@@ -61,6 +61,8 @@ export function AssetTable({
                   <Button
                     variant="secondary"
                     icon={FaExternalLinkAlt}
+                    aria-label="URL öffnen"
+                    title="URL öffnen"
                     onClick={() =>
                       window.open(asset.url, '_blank', 'noopener,noreferrer')
                     }
