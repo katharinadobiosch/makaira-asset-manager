@@ -1,0 +1,108 @@
+.common_trigger:
+  only: &common_trigger
+    - stable
+    - stage
+
+.stage_trigger: &stage_trigger
+  only:
+    - stage
+  environment:
+    name: stage
+
+.live_trigger: &live_trigger
+  only:
+    - stable
+  environment:
+    name: prod
+
+variables:
+  GIT_STRATEGY: none
+  GIT_CLONE_PATH: $CI_BUILDS_DIR/$CI_PROJECT_PATH/$CI_COMMIT_REF_NAME
+  KEEP_RELEASES: 10
+
+stages:
+  - init
+  - prepare
+  - build
+  - deploy
+
+init:
+  stage: init
+  only: *common_trigger
+  variables:
+    GIT_STRATEGY: clone
+  script:
+    - cp .env.ci .env
+
+prepare:env:stage:
+  <<: *stage_trigger
+  extends: .prepare:env
+
+prepare:env:prod:
+  <<: *live_trigger
+  extends: .prepare:env
+
+build:stage:
+  <<: *stage_trigger
+  extends: .build
+  variables:
+    BUILD_ENVIRONMENT: stage
+
+build:prod:
+  <<: *live_trigger
+  extends: .build
+  variables:
+    BUILD_ENVIRONMENT: prod
+
+.prepare:env:
+  stage: prepare
+  script:
+    - echo $CI_ENVIRONMENT_NAME
+    - echo "NEXT_PUBLIC_DEV_TOKEN=$NEXT_PUBLIC_DEV_TOKEN" >> .env
+    - echo "DEV_DOMAIN=$DEV_DOMAIN" >> .env
+    - echo "DEV_INSTANCE=$DEV_INSTANCE" >> .env
+    - echo "MAKAIRA_APP_SECRET=$MAKAIRA_APP_SECRET" >> .env
+    - echo "MAKAIRA_APP_SLUG=$MAKAIRA_APP_SLUG" >> .env
+    - echo "NEXT_PUBLIC_APP_DOMAIN=$NEXT_PUBLIC_APP_DOMAIN" >> .env
+    - echo "AWS_REGION=$AWS_REGION" >> .env
+    - echo "S3_PREFIX=$S3_PREFIX" >> .env
+    - echo "AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID" >> .env
+    - echo "AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY" >> .env
+    - echo "S3_BUCKET_NAME=$S3_BUCKET_NAME" >> .env
+    - echo "S3_ASSET_BASE_URL=$S3_ASSET_BASE_URL" >> .env
+
+.build:
+  stage: build
+  variables:
+    BUILD_PATH: /home/gitlab-runner/releases/makaira-asset-manager
+  script:
+    - echo $CI_ENVIRONMENT_NAME
+    - npm ci
+    - npm run build
+    - mkdir -p $BUILD_PATH/$BUILD_ENVIRONMENT
+    - NOW=$(date +%Y.%m.%d.%H.%M)
+    - tar -czf $BUILD_PATH/$BUILD_ENVIRONMENT/$CI_COMMIT_SHA.tar.gz .
+    - /opt/repos/sc-lib/gitlab-ci/register_release.py $BUILD_PATH/releases.json $CI_COMMIT_SHA $KEEP_RELEASES "$NOW $CI_COMMIT_REF_NAME"
+
+    # cleanup
+    - cd $BUILD_PATH/$BUILD_ENVIRONMENT
+    - ls -A1t $BUILD_PATH/$BUILD_ENVIRONMENT | tail -n +$KEEP_RELEASES | xargs -r rm
+
+deploy:stage:
+  stage: deploy
+  <<: *stage_trigger
+  script:
+    - '###'
+    - '# Automatic deployment to stage'
+    - '###'
+    - curl --data-urlencode "argString=-commitid $CI_COMMIT_SHA environment stage" http://localhost:4440/api/13/job/$RUNDECK_DEPLOY_JOB_ID/run?authtoken=$RUNDECK_API_TOKEN
+
+deploy:prod:
+  stage: deploy
+  <<: *live_trigger
+  when: manual
+  script:
+    - '###'
+    - '# Manual deployment to prod'
+    - '###'
+    - curl --data-urlencode "argString=-commitid $CI_COMMIT_SHA environment prod" http://localhost:4440/api/13/job/$RUNDECK_DEPLOY_JOB_ID/run?authtoken=$RUNDECK_API_TOKEN
