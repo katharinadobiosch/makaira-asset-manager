@@ -1,7 +1,7 @@
 import { useRef } from 'react'
 import styles from '@/pages/index.module.scss'
 import { Button, TextInput, Text, Badge, Collapse, Panel } from '@/components'
-import { FaUpload, FaSpinner, FaExclamationCircle } from 'react-icons/fa'
+import { FaUpload, FaExclamationCircle } from 'react-icons/fa'
 
 type AssetUploadFormProps = {
   title: string

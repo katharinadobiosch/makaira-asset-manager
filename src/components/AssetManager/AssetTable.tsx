@@ -57,13 +57,15 @@ export function AssetTable({
             title="URL"
             render={(asset: Asset) => (
               <div className={styles.urlAction}>
-                <Button
-                  variant="secondary"
-                  icon={FaExternalLinkAlt}
-                  onClick={() =>
-                    window.open(asset.url, '_blank', 'noopener,noreferrer')
-                  }
-                />
+                <Tooltip placement="top" overlay={<span>URL öffnen</span>}>
+                  <Button
+                    variant="secondary"
+                    icon={FaExternalLinkAlt}
+                    onClick={() =>
+                      window.open(asset.url, '_blank', 'noopener,noreferrer')
+                    }
+                  />
+                </Tooltip>
               </div>
             )}
           />
@@ -81,8 +83,8 @@ export function AssetTable({
                   <Button
                     variant="secondary"
                     icon={copiedAssetKey === asset.imageKey ? FaCheck : FaCopy}
-                    aria-label="URL öffnen"
-                    title="URL öffnen"
+                    aria-label="URL kopieren"
+                    title="URL kopieren"
                     onClick={() => onCopyUrl(asset)}
                   />
                 </Tooltip>
