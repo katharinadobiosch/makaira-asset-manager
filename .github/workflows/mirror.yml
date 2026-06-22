@@ -19,5 +19,5 @@ jobs:
       - name: Push current branch to mirror repo
         run: |
           BRANCH=${GITHUB_REF#refs/heads/}
-          git remote add mirror https://x-access-token:${{ secrets.MIRROR_REPO_TOKEN }}@github.com/katharinadobiosch/makaira-image-manager.git
+          git remote add mirror https://x-access-token:${{ secrets.MIRROR_REPO_TOKEN }}@github.com/katharinadobiosch/makaira-asset-manager.git
           git push mirror HEAD:$BRANCH

@@ -9,7 +9,6 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint --fix",
-    "push:both": "git push origin stable && git push netlify stable"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "3.1056.0",
