@@ -11,13 +11,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout full history
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.MIRROR_SSH_KEY }}
 
       - name: Push current branch to mirror repo
         run: |
           BRANCH=${GITHUB_REF#refs/heads/}
-          git remote add mirror https://x-access-token:${{ secrets.MIRROR_REPO_TOKEN }}@github.com/katharinadobiosch/makaira-image-manager.git
+          git remote add mirror git@github.com:katharinadobiosch/makaira-image-manager.git
           git push mirror HEAD:$BRANCH
