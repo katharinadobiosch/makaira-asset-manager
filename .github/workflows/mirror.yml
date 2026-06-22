@@ -1,4 +1,3 @@
-# .github/workflows/mirror.yml
 name: Mirror to personal repo
 
 on:
@@ -17,8 +16,8 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Push to mirror repo
+      - name: Push current branch to mirror repo
         run: |
+          BRANCH=${GITHUB_REF#refs/heads/}
           git remote add mirror https://x-access-token:${{ secrets.MIRROR_REPO_TOKEN }}@github.com/katharinadobiosch/makaira-asset-manager.git
-          git push mirror stable
-          git push mirror stage
+          git push mirror HEAD:$BRANCH
