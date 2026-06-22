@@ -1,0 +1,23 @@
+name: Mirror to personal repo
+
+on:
+  push:
+    branches:
+      - stable
+      - stage
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout full history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Push current branch to mirror repo
+        run: |
+          BRANCH=${GITHUB_REF#refs/heads/}
+          git remote add mirror https://x-access-token:${{ secrets.MIRROR_REPO_TOKEN }}@github.com/katharinadobiosch/makaira-asset-manager.git
+          git push mirror HEAD:$BRANCH
