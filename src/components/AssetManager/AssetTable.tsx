@@ -1,4 +1,3 @@
-import Image from 'next/image'
 import {
   FaCopy,
   FaCheck,
@@ -35,7 +34,7 @@ export function AssetTable({
           <Column
             title="Bild"
             render={(asset: Asset) => (
-              <Image
+              <img
                 className={styles.thumbnail}
                 src={asset.url}
                 alt={asset.alt}
