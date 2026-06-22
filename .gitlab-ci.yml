@@ -64,10 +64,10 @@ build:prod:
     - echo "MAKAIRA_APP_SECRET=$MAKAIRA_APP_SECRET" >> .env
     - echo "MAKAIRA_APP_SLUG=$MAKAIRA_APP_SLUG" >> .env
     - echo "NEXT_PUBLIC_APP_DOMAIN=$NEXT_PUBLIC_APP_DOMAIN" >> .env
-    - echo "AWS_REGION=$AWS_REGION" >> .env
+    - echo "APP_AWS_REGION=$APP_AWS_REGION" >> .env
     - echo "S3_PREFIX=$S3_PREFIX" >> .env
-    - echo "AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID" >> .env
-    - echo "AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY" >> .env
+    - echo "APP_AWS_ACCESS_KEY_ID=$APP_AWS_ACCESS_KEY_ID" >> .env
+    - echo "APP_AWS_SECRET_ACCESS_KEY=$APP_AWS_SECRET_ACCESS_KEY" >> .env
     - echo "S3_BUCKET_NAME=$S3_BUCKET_NAME" >> .env
     - echo "S3_ASSET_BASE_URL=$S3_ASSET_BASE_URL" >> .env
 

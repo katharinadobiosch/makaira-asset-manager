@@ -24,15 +24,56 @@ App lokal öffnen:
 http://localhost:3000?appType=app
 ```
 
+## Deployment
+
+Die App wird über Netlify deployed.
+
+Der produktive Deploy-Branch ist:
+
+```txt
+stable
+```
+
+Bei jedem Push auf den Branch `stable` im verbundenen Netlify-Repository wird automatisch ein neues Deployment gestartet.
+
+## Git Remotes
+
+Dieses Projekt verwendet mehrere Git Remotes:
+
+```txt
+origin   -> Bettwaren-Shop/bws-makaira-asset-manager
+netlify  -> katharinadobiosch/makaira-asset-manager
+upstream -> MakairaIO/app-boilerplate-nextjs
+```
+
+Push ins BWS-Repository:
+
+```bash
+git push origin stable
+```
+
+Push ins Netlify/GitHub-Repository:
+
+```bash
+git push netlify stable
+```
+
+Push in beide Repositories:
+
+```bash
+npm run push:both
+```
+
+
 ## Benötigte ENV Variablen
 
 ```env
 MAKAIRA_APP_SECRET=
 MAKAIRA_APP_SLUG=
 
-AWS_REGION=
-AWS_ACCESS_KEY_ID=
-AWS_SECRET_ACCESS_KEY=
+APP_AWS_REGION=
+APP_AWS_ACCESS_KEY_ID=
+APP_AWS_SECRET_ACCESS_KEY=
 S3_BUCKET_NAME=
 S3_PREFIX=
 S3_ASSET_BASE_URL=
